@@ -1164,7 +1164,7 @@ const App: React.FC = () => {
 
   const renderCosmosExplorer = () => (
     <div className="cosmos-explorer">
-      <div className="cosmos-header">
+      <div className="tracker-header">
         <h2>🔭 Cosmic Discovery Center</h2>
         <p>Latest astronomical discoveries and space exploration updates</p>
         <div className="online-status">
