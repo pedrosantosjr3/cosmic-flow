@@ -67,6 +67,28 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
   const [filterType, setFilterType] = useState<string>('')
   const [showControls, setShowControls] = useState(true)
   const [zoomLevel, setZoomLevel] = useState(1)
+  const [manualTransform, setManualTransform] = useState({ x: 0, y: 0, k: 1 })
+
+  // Manual zoom function as backup
+  const manualZoom = (scaleFactor: number) => {
+    console.log('Manual zoom triggered with factor:', scaleFactor)
+    if (svgRef.current) {
+      const svg = d3.select(svgRef.current)
+      const container = svg.select('.zoom-container')
+      
+      if (container.node()) {
+        const newTransform = {
+          ...manualTransform,
+          k: Math.max(0.1, Math.min(10, manualTransform.k * scaleFactor))
+        }
+        setManualTransform(newTransform)
+        setZoomLevel(newTransform.k)
+        
+        container.attr('transform', `translate(${newTransform.x},${newTransform.y}) scale(${newTransform.k})`)
+        console.log('Manual zoom applied:', newTransform)
+      }
+    }
+  }
 
   // Initialize universe data
   useEffect(() => {
@@ -956,7 +978,9 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
 
     // Store zoom behavior in ref for button access
     zoomRef.current = zoom
+    console.log('Zoom behavior initialized:', { zoom, svg: !!svg.node() })
     svg.call(zoom)
+    console.log('Zoom behavior applied to SVG')
 
     // Create gradient definitions for 3D effects
     const defs = container.append('defs')
@@ -1421,11 +1445,21 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                 <div className="zoom-buttons">
                   <button 
                     onClick={() => {
+                      console.log('Zoom In clicked', { svgRef: !!svgRef.current, zoomRef: !!zoomRef.current })
                       if (svgRef.current && zoomRef.current) {
-                        const svg = d3.select(svgRef.current)
-                        svg.transition().duration(300).ease(d3.easeQuadOut).call(
-                          zoomRef.current.scaleBy, 1.5
-                        )
+                        try {
+                          const svg = d3.select(svgRef.current)
+                          console.log('Attempting D3 zoom in...')
+                          svg.transition().duration(300).ease(d3.easeQuadOut).call(
+                            zoomRef.current.scaleBy, 1.5
+                          )
+                        } catch (error) {
+                          console.error('D3 zoom failed, using manual zoom:', error)
+                          manualZoom(1.5)
+                        }
+                      } else {
+                        console.log('Using manual zoom fallback')
+                        manualZoom(1.5)
                       }
                     }}
                     className="zoom-btn zoom-in"
@@ -1435,11 +1469,21 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                   </button>
                   <button 
                     onClick={() => {
+                      console.log('Zoom Out clicked', { svgRef: !!svgRef.current, zoomRef: !!zoomRef.current })
                       if (svgRef.current && zoomRef.current) {
-                        const svg = d3.select(svgRef.current)
-                        svg.transition().duration(300).ease(d3.easeQuadOut).call(
-                          zoomRef.current.scaleBy, 0.67
-                        )
+                        try {
+                          const svg = d3.select(svgRef.current)
+                          console.log('Attempting D3 zoom out...')
+                          svg.transition().duration(300).ease(d3.easeQuadOut).call(
+                            zoomRef.current.scaleBy, 0.67
+                          )
+                        } catch (error) {
+                          console.error('D3 zoom failed, using manual zoom:', error)
+                          manualZoom(0.67)
+                        }
+                      } else {
+                        console.log('Using manual zoom fallback')
+                        manualZoom(0.67)
                       }
                     }}
                     className="zoom-btn zoom-out"
