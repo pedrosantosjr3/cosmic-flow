@@ -8,6 +8,7 @@ import './enhanced-styles.css'
 import './background-override.css'
 import './direct-backgrounds.css'
 import './mobile-fixes.css'
+import './physics-mobile.css'
 
 type TabType = 'universe' | 'physics' | 'neo-tracker' | 'cosmos' | 'earth-weather' | 'author'
 
