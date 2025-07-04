@@ -57,6 +57,7 @@ interface UniverseGraphProps {
 const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCategory }) => {
   const svgRef = useRef<SVGSVGElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const zoomRef = useRef<any>(null)
   const [nodes, setNodes] = useState<UniverseNode[]>([])
   const [links, setLinks] = useState<UniverseLink[]>([])
   const [loading, setLoading] = useState(true)
@@ -757,36 +758,141 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       .style('max-width', '100%')
       .style('height', 'auto')
 
-    // Create stable simulation with gentler forces
-    const simulation = d3.forceSimulation(filteredNodes as any)
-      .force('link', d3.forceLink(links.filter(l => 
-        filteredNodes.some(n => n.id === l.source) && 
-        filteredNodes.some(n => n.id === l.target)
-      )).id((d: any) => d.id).strength(0.1))
-      .force('charge', d3.forceManyBody().strength(-100))
-      .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius((d: any) => d.size + 10).strength(0.7))
-      .alpha(0.3)
-      .alphaDecay(0.02)
-
-    // Create zoom behavior with enhanced controls
-    const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.1, 8])
-      .on('zoom', (event) => {
-        container.attr('transform', event.transform)
-        setZoomLevel(event.transform.k)
-        
-        // Adaptive label visibility based on zoom level
-        const labels = container.selectAll('text')
-        if (event.transform.k < 0.5) {
-          labels.style('opacity', 0)
-        } else if (event.transform.k < 1) {
-          labels.style('opacity', 0.5)
-        } else {
-          labels.style('opacity', 1)
+    // Position nodes based on realistic astronomical distances and spatial relationships
+    const positionNodesRealistically = () => {
+      const centerX = width / 2
+      const centerY = height / 2
+      
+      // Define scale factors for different cosmic regions
+      const solarSystemScale = 200 // pixels per AU
+      const localStarScale = 50    // pixels per light-year
+      const galacticScale = 0.1    // pixels per light-year for distant objects
+      
+      filteredNodes.forEach((node: any) => {
+        // Position solar system objects based on actual distances
+        if (['sun', 'mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'].includes(node.id)) {
+          const distance = node.distance || 0
+          const angle = (node.id === 'sun' ? 0 : Math.random() * 2 * Math.PI)
+          
+          if (node.id === 'sun') {
+            node.x = centerX
+            node.y = centerY
+          } else {
+            node.x = centerX + Math.cos(angle) * distance * solarSystemScale
+            node.y = centerY + Math.sin(angle) * distance * solarSystemScale
+          }
         }
+        // Position moons around their parent planets
+        else if (node.type === 'moon' && node.data?.parent) {
+          const parent = filteredNodes.find((n: any) => n.id === node.data.parent)
+          if (parent) {
+            const moonAngle = Math.random() * 2 * Math.PI
+            const moonDistance = 20 + Math.random() * 30 // 20-50 pixels from parent
+            node.x = (parent.x || centerX) + Math.cos(moonAngle) * moonDistance
+            node.y = (parent.y || centerY) + Math.sin(moonAngle) * moonDistance
+          }
+        }
+        // Position nearby stars based on their actual distances
+        else if (node.type === 'star' && node.distance) {
+          const starAngle = Math.random() * 2 * Math.PI
+          const starDistance = node.distance * localStarScale
+          node.x = centerX + Math.cos(starAngle) * starDistance
+          node.y = centerY + Math.sin(starAngle) * starDistance
+        }
+        // Position quantum/cosmic phenomena in background
+        else if (['dark-matter', 'dark-energy', 'quantum', 'spacetime'].includes(node.type)) {
+          const bgAngle = Math.random() * 2 * Math.PI
+          const bgDistance = 400 + Math.random() * 200
+          node.x = centerX + Math.cos(bgAngle) * bgDistance
+          node.y = centerY + Math.sin(bgAngle) * bgDistance
+        }
+        // Position galaxies and nebulae at cosmic distances
+        else if (['galaxy', 'nebula'].includes(node.type)) {
+          const cosmicAngle = Math.random() * 2 * Math.PI
+          const cosmicDistance = 600 + Math.random() * 400
+          node.x = centerX + Math.cos(cosmicAngle) * cosmicDistance
+          node.y = centerY + Math.sin(cosmicAngle) * cosmicDistance
+        }
+        // Position exoplanets based on their star distances
+        else if (node.type === 'exoplanet' && node.distance) {
+          const exoAngle = Math.random() * 2 * Math.PI
+          const exoDistance = Math.min(node.distance * galacticScale, 300) + 250
+          node.x = centerX + Math.cos(exoAngle) * exoDistance
+          node.y = centerY + Math.sin(exoAngle) * exoDistance
+        }
+        // Position asteroids in asteroid belt or near-Earth space
+        else if (node.type === 'asteroid') {
+          if (node.data?.isPotentiallyHazardous) {
+            // Near-Earth asteroids
+            const neoAngle = Math.random() * 2 * Math.PI
+            const neoDistance = 150 + Math.random() * 100
+            node.x = centerX + Math.cos(neoAngle) * neoDistance
+            node.y = centerY + Math.sin(neoAngle) * neoDistance
+          } else {
+            // Asteroid belt (around 2.7 AU average)
+            const beltAngle = Math.random() * 2 * Math.PI
+            const beltDistance = 2.7 * solarSystemScale + (Math.random() - 0.5) * 100
+            node.x = centerX + Math.cos(beltAngle) * beltDistance
+            node.y = centerY + Math.sin(beltAngle) * beltDistance
+          }
+        }
+        // Default positioning for any unhandled objects
+        else {
+          const defaultAngle = Math.random() * 2 * Math.PI
+          const defaultDistance = 300 + Math.random() * 200
+          node.x = centerX + Math.cos(defaultAngle) * defaultDistance
+          node.y = centerY + Math.sin(defaultAngle) * defaultDistance
+        }
+        
+        // Ensure fixed positions (no simulation drift)
+        node.fx = node.x
+        node.fy = node.y
+      })
+    }
+    
+    positionNodesRealistically()
+    
+    // Create minimal simulation only for initial positioning stabilization
+    d3.forceSimulation(filteredNodes as any)
+      .force('collision', d3.forceCollide().radius((d: any) => d.size + 5).strength(0.3))
+      .alpha(0.1)
+      .alphaDecay(0.1)
+      .stop() // Stop immediately after positioning
+
+    // Create smooth zoom behavior with enhanced controls
+    const zoom = d3.zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.05, 20])
+      .duration(300)
+      .on('zoom', (event) => {
+        const transform = event.transform
+        container.attr('transform', transform)
+        setZoomLevel(transform.k)
+        
+        // Adaptive label visibility and size based on zoom level
+        const labels = container.selectAll('text')
+        if (transform.k < 0.2) {
+          labels.style('opacity', 0)
+        } else if (transform.k < 0.5) {
+          labels.style('opacity', 0.3).attr('font-size', '10px')
+        } else if (transform.k < 1) {
+          labels.style('opacity', 0.7).attr('font-size', '11px')
+        } else if (transform.k < 3) {
+          labels.style('opacity', 1).attr('font-size', '12px')
+        } else {
+          labels.style('opacity', 1).attr('font-size', Math.min(16, 12 + transform.k) + 'px')
+        }
+        
+        // Adaptive node visibility based on zoom level
+        const nodes = container.selectAll('.node')
+        nodes.style('opacity', (d: any) => {
+          if (transform.k < 0.1) return 0.3
+          if (transform.k < 0.5 && d.size < 10) return 0.5
+          return 1
+        })
       })
 
+    // Store zoom behavior in ref for button access
+    zoomRef.current = zoom
     svg.call(zoom)
 
     // Create container for zoomable content
@@ -1149,35 +1255,28 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       }
     })
 
-    // Add stable drag behavior
+    // Add drag behavior for repositioning objects
     const drag = d3.drag<SVGGElement, any>()
-      .on('start', (event, d) => {
-        if (!event.active) simulation.alphaTarget(0.1).restart()
-        d.fx = d.x
-        d.fy = d.y
+      .on('start', (event) => {
+        d3.select(event.sourceEvent.target.parentNode).raise()
       })
       .on('drag', (event, d) => {
+        d.x = event.x
+        d.y = event.y
         d.fx = event.x
         d.fy = event.y
+        updatePositions()
       })
       .on('end', (event, d) => {
-        if (!event.active) simulation.alphaTarget(0)
-        // Keep nodes in position after dragging for stability
+        // Keep the new position
         d.fx = event.x
         d.fy = event.y
       })
 
     node.call(drag)
 
-    // Update positions on simulation tick with boundary constraints
-    simulation.on('tick', () => {
-      // Constrain nodes to stay within the visible area
-      filteredNodes.forEach((d: any) => {
-        const margin = d.size + 20
-        d.x = Math.max(margin, Math.min(width - margin, d.x))
-        d.y = Math.max(margin, Math.min(height - margin, d.y))
-      })
-
+    // Position links and nodes based on fixed astronomical positions
+    const updatePositions = () => {
       link
         .attr('x1', (d: any) => d.source.x)
         .attr('y1', (d: any) => d.source.y)
@@ -1185,7 +1284,9 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
         .attr('y2', (d: any) => d.target.y)
 
       node.attr('transform', (d: any) => `translate(${d.x},${d.y})`)
-    })
+    }
+    
+    updatePositions()
 
   }, [filteredNodes, links, loading, selectedNode, onNodeClick, dimensions])
 
@@ -1259,37 +1360,42 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                 <div className="zoom-buttons">
                   <button 
                     onClick={() => {
-                      const svg = d3.select(svgRef.current)
-                      svg.transition().duration(300).call(
-                        d3.zoom<SVGSVGElement, unknown>().scaleBy as any, 1.5
-                      )
+                      if (svgRef.current && zoomRef.current) {
+                        const svg = d3.select(svgRef.current)
+                        svg.transition().duration(300).call(
+                          zoomRef.current.scaleBy, 1.5
+                        )
+                      }
                     }}
                     className="zoom-btn"
                   >
-                    🔍+
+                    🔍+ Zoom In
                   </button>
                   <button 
                     onClick={() => {
-                      const svg = d3.select(svgRef.current)
-                      svg.transition().duration(300).call(
-                        d3.zoom<SVGSVGElement, unknown>().scaleBy as any, 0.67
-                      )
+                      if (svgRef.current && zoomRef.current) {
+                        const svg = d3.select(svgRef.current)
+                        svg.transition().duration(300).call(
+                          zoomRef.current.scaleBy, 0.67
+                        )
+                      }
                     }}
                     className="zoom-btn"
                   >
-                    🔍−
+                    🔍− Zoom Out
                   </button>
                   <button 
                     onClick={() => {
-                      const svg = d3.select(svgRef.current)
-                      svg.transition().duration(500).call(
-                        d3.zoom<SVGSVGElement, unknown>().transform as any, 
-                        d3.zoomIdentity
-                      )
+                      if (svgRef.current && zoomRef.current) {
+                        const svg = d3.select(svgRef.current)
+                        svg.transition().duration(500).call(
+                          zoomRef.current.transform, d3.zoomIdentity
+                        )
+                      }
                     }}
                     className="zoom-btn reset"
                   >
-                    🎯 Reset
+                    🎯 Reset View
                   </button>
                 </div>
               </div>
@@ -1302,6 +1408,32 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                 <div className="stat-item">
                   <span className="stat-label">Total Objects:</span>
                   <span className="stat-value">{nodes.length}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Scale Representation:</span>
+                  <span className="stat-value">Realistic Distances</span>
+                </div>
+              </div>
+              
+              <div className="scale-legend">
+                <h4>🌌 Cosmic Scale Guide</h4>
+                <div className="scale-items">
+                  <div className="scale-item">
+                    <span className="scale-color inner"></span>
+                    <span className="scale-text">Solar System (AU scale)</span>
+                  </div>
+                  <div className="scale-item">
+                    <span className="scale-color near"></span>
+                    <span className="scale-text">Nearby Stars (light-years)</span>
+                  </div>
+                  <div className="scale-item">
+                    <span className="scale-color cosmic"></span>
+                    <span className="scale-text">Cosmic Objects (deep space)</span>
+                  </div>
+                  <div className="scale-item">
+                    <span className="scale-color quantum"></span>
+                    <span className="scale-text">Quantum Fields (universal)</span>
+                  </div>
                 </div>
               </div>
             </div>

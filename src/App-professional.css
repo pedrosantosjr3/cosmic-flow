@@ -233,6 +233,7 @@ body {
   background: transparent;
   overflow-y: auto;
   max-height: 100vh;
+  box-sizing: border-box;
 }
 
 /* Loading Screen */
@@ -307,16 +308,36 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* Main Content Container */
-.main-content {
-  position: fixed;
-  top: 80px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-  z-index: 1;
-  background: transparent !important;
+/* Main Content Container - Desktop Only */
+/* Desktop-specific main content */
+@media (min-width: 769px) {
+  .main-content {
+    position: fixed;
+    top: 80px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1;
+    background: transparent !important;
+  }
+  
+  /* Ensure desktop sections are scrollable */
+  .author-section,
+  .cosmos-explorer,
+  .neo-tracker,
+  .earth-weather {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  
+  /* Fix universe explorer for desktop */
+  .universe-explorer {
+    height: 100%;
+    overflow: hidden;
+  }
 }
 
 /* Mobile Override for Main Content */
@@ -842,15 +863,17 @@ body {
 
 /* Cosmos Explorer */
 .cosmos-explorer {
-  padding: 40px;
+  padding: 40px 40px 120px 40px;
   min-height: calc(100vh - 80px);
   background: transparent !important;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .cosmos-header {
   text-align: center;
   margin-bottom: 40px;
+  padding-top: 20px;
 }
 
 .cosmos-header h2 {
@@ -1171,10 +1194,11 @@ body {
 
 /* Author Section */
 .author-section {
-  padding: 40px 40px 150px 40px;
+  padding: 40px 40px 200px 40px;
   min-height: calc(100vh - 80px);
   background: transparent !important;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .author-header {
@@ -1543,7 +1567,7 @@ body {
   backdrop-filter: blur(15px);
   position: relative;
   overflow: visible;
-  margin-bottom: 80px;
+  margin-bottom: 150px;
 }
 
 .quote-mark {

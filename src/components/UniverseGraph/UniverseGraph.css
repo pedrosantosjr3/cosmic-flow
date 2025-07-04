@@ -778,6 +778,70 @@
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
+.scale-legend {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 15px;
+}
+
+.scale-legend h4 {
+  color: #667eea;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.scale-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scale-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.scale-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.scale-color.inner {
+  background: radial-gradient(circle, #FFD700, #FF8C00);
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+}
+
+.scale-color.near {
+  background: radial-gradient(circle, #4A90E2, #2E5B8C);
+  box-shadow: 0 0 8px rgba(74, 144, 226, 0.4);
+}
+
+.scale-color.cosmic {
+  background: radial-gradient(circle, #FF69B4, #DC143C);
+  box-shadow: 0 0 8px rgba(255, 105, 180, 0.4);
+}
+
+.scale-color.quantum {
+  background: radial-gradient(circle, #00CED1, #008B8B);
+  box-shadow: 0 0 8px rgba(0, 206, 209, 0.4);
+}
+
+.scale-text {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
 /* Enhanced mobile responsiveness for new controls */
 @media (max-width: 768px) {
   .graph-controls {
