@@ -1057,14 +1057,14 @@ const App: React.FC = () => {
   )
 
   const renderNEOTracker = () => {
-    // Get the most threatening NEO
-    const mostThreatening = cosmicData.hazardousAsteroids
+    // Get the top 3 most threatening NEOs
+    const topThreats = cosmicData.hazardousAsteroids
       .filter(neo => neo.close_approach_data && neo.close_approach_data.length > 0)
       .sort((a, b) => {
         const distA = parseFloat(a.close_approach_data[0].miss_distance.kilometers)
         const distB = parseFloat(b.close_approach_data[0].miss_distance.kilometers)
         return distA - distB
-      })[0]
+      }).slice(0, 3)
     
     const minutesSinceUpdate = Math.floor(Math.random() * 5) + 1 // Simulate recent update
     
@@ -1097,28 +1097,53 @@ const App: React.FC = () => {
             
             <div className="stat-card">
               <h3>Risk Assessment</h3>
-              <div className="stat-number">{mostThreatening ? 'ELEVATED' : 'NORMAL'}</div>
-              <p>{mostThreatening ? `${mostThreatening.name} monitoring` : 'Standard monitoring'}</p>
+              <div className="stat-number">{topThreats.length > 0 ? 'ELEVATED' : 'NORMAL'}</div>
+              <p>{topThreats.length > 0 ? `${topThreats.length} high-priority objects` : 'Standard monitoring'}</p>
             </div>
           </div>
           
-          {mostThreatening && (
+          {topThreats.length > 0 && (
             <div className="neo-alerts">
-              <div className="alert-banner">
-                <div className="alert-icon">⚠️</div>
-                <div className="alert-content">
-                  <strong>Current Threat Status - {dateValidator.formatDateWithRecency(new Date('2025-07-04'))}:</strong>
-                  <p>
-                    {mostThreatening.name} approaching {dateValidator.formatDateWithRecency(mostThreatening.close_approach_data[0].close_approach_date)} 
-                    at {(parseFloat(mostThreatening.close_approach_data[0].miss_distance.kilometers) / 1000000).toFixed(2)}M km distance. 
-                    Impact probability: {'<'}0.001%. Continuous monitoring active.
-                  </p>
-                  <span className="alert-time">
-                    🕐 Updated {minutesSinceUpdate} min ago | Source: NASA JPL | 
-                    {cosmicData.error ? ' (Using cached data)' : ' Live feed active'}
-                  </span>
-                </div>
+              <div className="alerts-header">
+                <h3>🚨 Top 3 Current Threats - Updated Daily</h3>
+                <span className="update-time">
+                  🕐 Updated {minutesSinceUpdate} min ago | Source: NASA JPL | 
+                  {cosmicData.error ? ' (Using cached data)' : ' Live feed active'}
+                </span>
               </div>
+              {topThreats.map((threat, index) => (
+                <div key={threat.id} className={`threat-card priority-${index + 1}`}>
+                  <div className="threat-rank">#{index + 1}</div>
+                  <div className="threat-info">
+                    <div className="threat-header">
+                      <h4>{threat.name}</h4>
+                      <span className="threat-level">{calculateThreatLevel(threat)} RISK</span>
+                    </div>
+                    <div className="threat-details">
+                      <div className="detail-row">
+                        <span>📅 Approach Date:</span>
+                        <span>{dateValidator.formatDateWithRecency(threat.close_approach_data[0].close_approach_date)}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span>📏 Miss Distance:</span>
+                        <span>{(parseFloat(threat.close_approach_data[0].miss_distance.kilometers) / 1000000).toFixed(2)}M km</span>
+                      </div>
+                      <div className="detail-row">
+                        <span>📐 Diameter:</span>
+                        <span>{threat.estimated_diameter.kilometers.estimated_diameter_min.toFixed(3)} - {threat.estimated_diameter.kilometers.estimated_diameter_max.toFixed(3)} km</span>
+                      </div>
+                      <div className="detail-row">
+                        <span>⚡ Velocity:</span>
+                        <span>{parseFloat(threat.close_approach_data[0].relative_velocity.kilometers_per_hour).toLocaleString()} km/h</span>
+                      </div>
+                      <div className="detail-row">
+                        <span>🎯 Impact Probability:</span>
+                        <span>{'<'}0.001%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         
