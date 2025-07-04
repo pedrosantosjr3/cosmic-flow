@@ -885,11 +885,10 @@ body {
 
 /* Cosmos Explorer */
 .cosmos-explorer {
-  padding: 40px 40px 120px 40px;
+  padding: 40px;
   min-height: calc(100vh - 80px);
   background: transparent !important;
   overflow-y: auto;
-  box-sizing: border-box;
 }
 
 .cosmos-header {
