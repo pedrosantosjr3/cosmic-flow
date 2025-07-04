@@ -25,7 +25,16 @@ const Universe3D: React.FC<Universe3DProps> = ({ onNodeClick: _onNodeClick }) =>
   })
 
   useEffect(() => {
-    if (!mountRef.current) return
+    if (!mountRef.current) {
+      console.error('Universe3D: mountRef.current is null')
+      return
+    }
+
+    const container = mountRef.current
+    const containerWidth = container.clientWidth || 800
+    const containerHeight = container.clientHeight || 600
+
+    console.log('Universe3D: Initializing with dimensions:', containerWidth, 'x', containerHeight)
 
     // Scene setup
     const scene = new THREE.Scene()
@@ -35,7 +44,7 @@ const Universe3D: React.FC<Universe3DProps> = ({ onNodeClick: _onNodeClick }) =>
     // Camera setup
     const camera = new THREE.PerspectiveCamera(
       75,
-      window.innerWidth / window.innerHeight,
+      containerWidth / containerHeight,
       0.1,
       10000
     )
@@ -47,7 +56,7 @@ const Universe3D: React.FC<Universe3DProps> = ({ onNodeClick: _onNodeClick }) =>
       alpha: true,
       powerPreference: 'high-performance'
     })
-    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setSize(containerWidth, containerHeight)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
@@ -55,7 +64,13 @@ const Universe3D: React.FC<Universe3DProps> = ({ onNodeClick: _onNodeClick }) =>
     renderer.toneMappingExposure = 0.5
     rendererRef.current = renderer
 
-    mountRef.current.appendChild(renderer.domElement)
+    try {
+      mountRef.current.appendChild(renderer.domElement)
+      console.log('Universe3D: Renderer DOM element appended successfully')
+    } catch (error) {
+      console.error('Universe3D: Error appending renderer DOM element:', error)
+      return
+    }
 
     // Add starfield background
     createStarField(scene)
@@ -82,6 +97,7 @@ const Universe3D: React.FC<Universe3DProps> = ({ onNodeClick: _onNodeClick }) =>
 
     animate()
     setLoading(false)
+    console.log('Universe3D: Initialization complete')
 
     // Event listeners
     const handleMouseDown = (event: MouseEvent) => {
@@ -123,10 +139,12 @@ const Universe3D: React.FC<Universe3DProps> = ({ onNodeClick: _onNodeClick }) =>
     }
 
     const handleResize = () => {
-      if (!camera || !renderer) return
-      camera.aspect = window.innerWidth / window.innerHeight
+      if (!camera || !renderer || !container) return
+      const newWidth = container.clientWidth
+      const newHeight = container.clientHeight
+      camera.aspect = newWidth / newHeight
       camera.updateProjectionMatrix()
-      renderer.setSize(window.innerWidth, window.innerHeight)
+      renderer.setSize(newWidth, newHeight)
     }
 
     // Add event listeners
