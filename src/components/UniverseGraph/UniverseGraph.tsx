@@ -96,27 +96,33 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!svgRef.current || !zoomRef.current) return
       
+      // Only handle zoom keys when not typing in inputs
+      const target = event.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') {
+        return
+      }
+      
       const svg = d3.select(svgRef.current)
       
       // Zoom in with + or =
-      if ((event.key === '=' || event.key === '+') && !event.ctrlKey) {
+      if ((event.key === '=' || event.key === '+') && !event.ctrlKey && !event.metaKey) {
         event.preventDefault()
         svg.transition().duration(300).call(zoomRef.current.scaleBy, 1.5)
       }
       // Zoom out with -
-      else if (event.key === '-' && !event.ctrlKey) {
+      else if (event.key === '-' && !event.ctrlKey && !event.metaKey) {
         event.preventDefault()
         svg.transition().duration(300).call(zoomRef.current.scaleBy, 0.67)
       }
       // Reset with 0
-      else if (event.key === '0' && !event.ctrlKey) {
+      else if (event.key === '0' && !event.ctrlKey && !event.metaKey) {
         event.preventDefault()
         svg.transition().duration(500).call(zoomRef.current.transform, d3.zoomIdentity)
       }
     }
     
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
   }, [])
 
   // Handle click outside to close properties panel
@@ -887,10 +893,15 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       .alphaDecay(0.1)
       .stop() // Stop immediately after positioning
 
+    // Create container for zoomable content FIRST
+    const container = svg.append('g').attr('class', 'zoom-container')
+
     // Create smooth zoom behavior with enhanced controls
     const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.05, 20])
-      .duration(300)
+      .scaleExtent([0.1, 10])
+      .wheelDelta((event) => {
+        return -event.deltaY * (event.deltaMode === 1 ? 0.05 : event.deltaMode ? 1 : 0.002)
+      })
       .on('zoom', (event) => {
         const transform = event.transform
         container.attr('transform', transform)
@@ -898,33 +909,41 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
         
         // Adaptive label visibility and size based on zoom level
         const labels = container.selectAll('text')
-        if (transform.k < 0.2) {
-          labels.style('opacity', 0)
-        } else if (transform.k < 0.5) {
-          labels.style('opacity', 0.3).attr('font-size', '10px')
+        if (transform.k < 0.3) {
+          labels.style('opacity', 0).attr('font-size', '10px')
+        } else if (transform.k < 0.6) {
+          labels.style('opacity', 0.4).attr('font-size', '10px')
         } else if (transform.k < 1) {
           labels.style('opacity', 0.7).attr('font-size', '11px')
-        } else if (transform.k < 3) {
+        } else if (transform.k < 2) {
           labels.style('opacity', 1).attr('font-size', '12px')
+        } else if (transform.k < 4) {
+          labels.style('opacity', 1).attr('font-size', '13px')
         } else {
-          labels.style('opacity', 1).attr('font-size', Math.min(16, 12 + transform.k) + 'px')
+          labels.style('opacity', 1).attr('font-size', Math.min(16, 13 + transform.k * 0.5) + 'px')
         }
         
-        // Adaptive node visibility based on zoom level
+        // Improved adaptive node visibility and sizing
         const nodes = container.selectAll('.node')
         nodes.style('opacity', (d: any) => {
-          if (transform.k < 0.1) return 0.3
-          if (transform.k < 0.5 && d.size < 10) return 0.5
+          if (transform.k < 0.2) return 0.4
+          if (transform.k < 0.5 && d.size < 8) return 0.6
           return 1
         })
+        
+        // Scale node sizes slightly with zoom for better visibility
+        nodes.selectAll('circle')
+          .attr('r', (d: any) => {
+            const baseSize = d.size
+            if (transform.k < 0.5) return baseSize * 1.2
+            if (transform.k > 3) return baseSize * 0.8
+            return baseSize
+          })
       })
 
     // Store zoom behavior in ref for button access
     zoomRef.current = zoom
     svg.call(zoom)
-
-    // Create container for zoomable content
-    const container = svg.append('g')
 
     // Create gradient definitions for 3D effects
     const defs = container.append('defs')
@@ -1391,12 +1410,13 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                     onClick={() => {
                       if (svgRef.current && zoomRef.current) {
                         const svg = d3.select(svgRef.current)
-                        svg.transition().duration(300).call(
+                        svg.transition().duration(300).ease(d3.easeQuadOut).call(
                           zoomRef.current.scaleBy, 1.5
                         )
                       }
                     }}
-                    className="zoom-btn"
+                    className="zoom-btn zoom-in"
+                    title="Zoom in for detailed view"
                   >
                     🔍+ Zoom In
                   </button>
@@ -1404,12 +1424,13 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                     onClick={() => {
                       if (svgRef.current && zoomRef.current) {
                         const svg = d3.select(svgRef.current)
-                        svg.transition().duration(300).call(
+                        svg.transition().duration(300).ease(d3.easeQuadOut).call(
                           zoomRef.current.scaleBy, 0.67
                         )
                       }
                     }}
-                    className="zoom-btn"
+                    className="zoom-btn zoom-out"
+                    title="Zoom out for overview"
                   >
                     🔍− Zoom Out
                   </button>
@@ -1417,14 +1438,52 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                     onClick={() => {
                       if (svgRef.current && zoomRef.current) {
                         const svg = d3.select(svgRef.current)
-                        svg.transition().duration(500).call(
+                        svg.transition().duration(500).ease(d3.easeQuadInOut).call(
                           zoomRef.current.transform, d3.zoomIdentity
                         )
                       }
                     }}
                     className="zoom-btn reset"
+                    title="Reset to default view"
                   >
                     🎯 Reset View
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (svgRef.current && zoomRef.current) {
+                        const svg = d3.select(svgRef.current)
+                        const container = svg.select('.zoom-container')
+                        try {
+                          const bounds = (container.node() as any)?.getBBox()
+                          if (bounds && bounds.width > 0 && bounds.height > 0) {
+                            const fullWidth = dimensions.width
+                            const fullHeight = dimensions.height
+                            const scale = Math.min(fullWidth / bounds.width, fullHeight / bounds.height) * 0.7
+                            const translateX = fullWidth / 2 - scale * (bounds.x + bounds.width / 2)
+                            const translateY = fullHeight / 2 - scale * (bounds.y + bounds.height / 2)
+                            
+                            svg.transition().duration(750).ease(d3.easeQuadInOut).call(
+                              zoomRef.current.transform,
+                              d3.zoomIdentity.translate(translateX, translateY).scale(scale)
+                            )
+                          } else {
+                            // Fallback to reset if bounds calculation fails
+                            svg.transition().duration(500).call(
+                              zoomRef.current.transform, d3.zoomIdentity
+                            )
+                          }
+                        } catch (error) {
+                          console.log('Fit all fallback to reset')
+                          svg.transition().duration(500).call(
+                            zoomRef.current.transform, d3.zoomIdentity
+                          )
+                        }
+                      }
+                    }}
+                    className="zoom-btn fit-view"
+                    title="Fit all objects to view"
+                  >
+                    🌌 Fit All
                   </button>
                 </div>
               </div>
