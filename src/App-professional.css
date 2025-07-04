@@ -890,22 +890,6 @@ body {
   overflow-y: auto;
 }
 
-.cosmos-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.cosmos-header h2 {
-  color: #667eea;
-  font-size: 2.5rem;
-  font-weight: 300;
-  margin-bottom: 10px;
-}
-
-.cosmos-header p {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 1.1rem;
-}
 
 .cosmos-content {
   max-width: 1400px;
@@ -1835,14 +1819,12 @@ body {
   
   /* Mobile Headers */
   .tracker-header,
-  .cosmos-header,
   .author-header {
     margin-bottom: 25px;
     padding: 0 15px;
   }
   
-  .tracker-header h2,
-  .cosmos-header h2 {
+  .tracker-header h2 {
     font-size: 1.8rem;
   }
   
@@ -1934,7 +1916,6 @@ body {
     font-size: 1.8rem;
   }
   
-  .cosmos-header h2,
   .tracker-header h2 {
     font-size: 1.6rem;
   }
