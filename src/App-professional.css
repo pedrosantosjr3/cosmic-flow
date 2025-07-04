@@ -84,9 +84,11 @@ body {
 .view-mode-controls {
   display: flex;
   gap: 15px;
-  margin-top: 20px;
+  margin: 20px 0;
   justify-content: center;
   align-items: center;
+  position: relative;
+  z-index: 10;
 }
 
 .mode-btn {

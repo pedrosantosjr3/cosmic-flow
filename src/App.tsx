@@ -470,23 +470,19 @@ const App: React.FC = () => {
 
   const renderUniverseExplorer = () => (
     <div className="universe-explorer">
-      <div className="tracker-header">
-        <h2>🌌 Cosmic Discovery Center</h2>
-        <p>Navigate through the universe in 2D or immersive 3D visualization</p>
-        <div className="view-mode-controls">
-          <button 
-            className={`mode-btn ${viewMode === '2d' ? 'active' : ''}`}
-            onClick={() => setViewMode('2d')}
-          >
-            📊 2D Universe Graph
-          </button>
-          <button 
-            className={`mode-btn ${viewMode === '3d' ? 'active' : ''}`}
-            onClick={() => setViewMode('3d')}
-          >
-            🌌 3D Universe Explorer
-          </button>
-        </div>
+      <div className="view-mode-controls">
+        <button 
+          className={`mode-btn ${viewMode === '2d' ? 'active' : ''}`}
+          onClick={() => setViewMode('2d')}
+        >
+          📊 2D Universe Graph
+        </button>
+        <button 
+          className={`mode-btn ${viewMode === '3d' ? 'active' : ''}`}
+          onClick={() => setViewMode('3d')}
+        >
+          🌌 3D Universe Explorer
+        </button>
       </div>
       <div className="universe-content">
         <div className="graph-section">
