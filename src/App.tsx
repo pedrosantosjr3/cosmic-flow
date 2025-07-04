@@ -468,17 +468,6 @@ const App: React.FC = () => {
 
   const renderUniverseExplorer = () => (
     <div className="universe-explorer">
-      <div className="explorer-header">
-        <h2>🌌 Universe Explorer</h2>
-        <p>Interactive visualization of cosmic objects and their relationships</p>
-        <div className="online-status">
-          <div className="status-indicator">
-            <div className="status-dot online"></div>
-            <span>Online</span>
-          </div>
-        </div>
-      </div>
-      
       <div className="universe-content">
         <div className="graph-section">
           <UniverseGraph onNodeClick={handleNodeClick} />

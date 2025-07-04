@@ -885,7 +885,7 @@ body {
 /* Cosmos Explorer */
 .cosmos-explorer {
   padding: 40px;
-  min-height: calc(100vh - 80px);
+  min-height: calc(100vh - 90px);
   background: transparent !important;
   overflow-y: auto;
 }

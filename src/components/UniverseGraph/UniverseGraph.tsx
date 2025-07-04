@@ -77,17 +77,48 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       const container = svg.select('.zoom-container')
       
       if (container.node()) {
-        const newTransform = {
-          ...manualTransform,
-          k: Math.max(0.1, Math.min(10, manualTransform.k * scaleFactor))
-        }
+        const newK = Math.max(0.1, Math.min(10, manualTransform.k * scaleFactor))
+        const centerX = dimensions.width / 2
+        const centerY = dimensions.height / 2
+        const newX = centerX - (centerX - manualTransform.x) * (newK / manualTransform.k)
+        const newY = centerY - (centerY - manualTransform.y) * (newK / manualTransform.k)
+        
+        const newTransform = { x: newX, y: newY, k: newK }
         setManualTransform(newTransform)
         setZoomLevel(newTransform.k)
         
-        container.attr('transform', `translate(${newTransform.x},${newTransform.y}) scale(${newTransform.k})`)
+        container.transition()
+          .duration(300)
+          .attr('transform', `translate(${newTransform.x},${newTransform.y}) scale(${newTransform.k})`)
+        
         console.log('Manual zoom applied:', newTransform)
+        return true
       }
     }
+    return false
+  }
+
+  // Manual reset function
+  const manualReset = () => {
+    console.log('Manual reset triggered')
+    if (svgRef.current) {
+      const svg = d3.select(svgRef.current)
+      const container = svg.select('.zoom-container')
+      
+      if (container.node()) {
+        const resetTransform = { x: 0, y: 0, k: 1 }
+        setManualTransform(resetTransform)
+        setZoomLevel(1)
+        
+        container.transition()
+          .duration(500)
+          .attr('transform', `translate(0,0) scale(1)`)
+        
+        console.log('Manual reset applied')
+        return true
+      }
+    }
+    return false
   }
 
   // Initialize universe data
@@ -1493,11 +1524,20 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                   </button>
                   <button 
                     onClick={() => {
+                      console.log('Reset clicked')
                       if (svgRef.current && zoomRef.current) {
-                        const svg = d3.select(svgRef.current)
-                        svg.transition().duration(500).ease(d3.easeQuadInOut).call(
-                          zoomRef.current.transform, d3.zoomIdentity
-                        )
+                        try {
+                          const svg = d3.select(svgRef.current)
+                          svg.transition().duration(500).ease(d3.easeQuadInOut).call(
+                            zoomRef.current.transform, d3.zoomIdentity
+                          )
+                        } catch (error) {
+                          console.error('D3 reset failed, using manual reset:', error)
+                          manualReset()
+                        }
+                      } else {
+                        console.log('Using manual reset fallback')
+                        manualReset()
                       }
                     }}
                     className="zoom-btn reset"
