@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import UniverseGraph from './components/UniverseGraph/UniverseGraph'
+import Universe3D from './components/Universe3D/Universe3D'
 import { NeoObject, ApodData } from './services/nasaAPI'
 import { enhancedNasaAPI } from './services/enhancedNasaAPI'
 import { dateValidator, getTimeSinceEvent } from './utils/dateValidation'
@@ -230,6 +231,7 @@ const App: React.FC = () => {
   const [showBlackHoleSim, setShowBlackHoleSim] = useState(false)
   const [showQuantumSim, setShowQuantumSim] = useState(false)
   const [showEMWaves, setShowEMWaves] = useState(false)
+  const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d')
   const [cosmicData, setCosmicData] = useState<CosmicData>({
     neoObjects: [],
     hazardousAsteroids: [],
@@ -468,9 +470,31 @@ const App: React.FC = () => {
 
   const renderUniverseExplorer = () => (
     <div className="universe-explorer">
+      <div className="tracker-header">
+        <h2>🌌 Cosmic Discovery Center</h2>
+        <p>Navigate through the universe in 2D or immersive 3D visualization</p>
+        <div className="view-mode-controls">
+          <button 
+            className={`mode-btn ${viewMode === '2d' ? 'active' : ''}`}
+            onClick={() => setViewMode('2d')}
+          >
+            📊 2D Universe Graph
+          </button>
+          <button 
+            className={`mode-btn ${viewMode === '3d' ? 'active' : ''}`}
+            onClick={() => setViewMode('3d')}
+          >
+            🌌 3D Universe Explorer
+          </button>
+        </div>
+      </div>
       <div className="universe-content">
         <div className="graph-section">
-          <UniverseGraph onNodeClick={handleNodeClick} />
+          {viewMode === '2d' ? (
+            <UniverseGraph onNodeClick={handleNodeClick} />
+          ) : (
+            <Universe3D onNodeClick={handleNodeClick} />
+          )}
         </div>
         
         {selectedNode && (
