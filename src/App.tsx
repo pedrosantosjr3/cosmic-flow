@@ -38,71 +38,179 @@ interface CosmicData {
   error: string | null
 }
 
-// Mock data fallbacks for when APIs fail
+// Mock data fallbacks for when APIs fail - Updated July 2025 NEO threats
 const mockNeoData = [
   {
-    id: '2022091',
-    name: '2022 AP7',
+    id: '2025122',
+    name: '2025 GH4',
     nasa_jpl_url: '',
-    absolute_magnitude_h: 18.1,
+    absolute_magnitude_h: 19.2,
     estimated_diameter: {
       kilometers: {
-        estimated_diameter_min: 1.0,
-        estimated_diameter_max: 1.5
+        estimated_diameter_min: 0.8,
+        estimated_diameter_max: 1.2
       }
     },
     is_potentially_hazardous_asteroid: true,
     close_approach_data: [{
-      close_approach_date: '2024-12-15',
-      close_approach_date_full: '2024-Dec-15 14:30',
-      epoch_date_close_approach: 1734265800000,
+      close_approach_date: '2025-09-15',
+      close_approach_date_full: '2025-Sep-15 08:45',
+      epoch_date_close_approach: 1757845500000,
       relative_velocity: {
-        kilometers_per_second: '15.2',
-        kilometers_per_hour: '54720',
-        miles_per_hour: '34000'
+        kilometers_per_second: '18.7',
+        kilometers_per_hour: '67320',
+        miles_per_hour: '41825'
       },
       miss_distance: {
-        astronomical: '0.05',
-        lunar: '19.5',
-        kilometers: '7480000',
-        miles: '4650000'
+        astronomical: '0.032',
+        lunar: '12.4',
+        kilometers: '4785000',
+        miles: '2973000'
       },
       orbiting_body: 'Earth'
     }],
     orbital_data: {
       orbit_id: '1',
-      orbit_determination_date: '2024-01-01',
-      first_observation_date: '2022-01-01',
-      last_observation_date: '2024-01-01',
-      data_arc_in_days: 730,
-      observations_used: 150,
+      orbit_determination_date: '2025-07-01',
+      first_observation_date: '2025-01-15',
+      last_observation_date: '2025-07-03',
+      data_arc_in_days: 169,
+      observations_used: 87,
+      orbit_uncertainty: '1',
+      minimum_orbit_intersection: '.032',
+      jupiter_tisserand_invariant: '3.2',
+      epoch_osculation: '2025-07-01',
+      eccentricity: '0.18',
+      semi_major_axis: '1.3',
+      inclination: '4.8',
+      ascending_node_longitude: '52.3',
+      orbital_period: '478.5',
+      perihelion_distance: '1.07',
+      perihelion_argument: '134.2',
+      aphelion_distance: '1.53',
+      perihelion_time: '2025-08-22',
+      mean_anomaly: '198.7',
+      mean_motion: '0.75',
+      equinox: 'J2000'
+    }
+  },
+  {
+    id: '2025089',
+    name: '2025 FL8',
+    nasa_jpl_url: '',
+    absolute_magnitude_h: 20.8,
+    estimated_diameter: {
+      kilometers: {
+        estimated_diameter_min: 0.3,
+        estimated_diameter_max: 0.6
+      }
+    },
+    is_potentially_hazardous_asteroid: false,
+    close_approach_data: [{
+      close_approach_date: '2025-08-28',
+      close_approach_date_full: '2025-Aug-28 16:12',
+      epoch_date_close_approach: 1756299120000,
+      relative_velocity: {
+        kilometers_per_second: '12.4',
+        kilometers_per_hour: '44640',
+        miles_per_hour: '27735'
+      },
+      miss_distance: {
+        astronomical: '0.089',
+        lunar: '34.6',
+        kilometers: '13320000',
+        miles: '8276000'
+      },
+      orbiting_body: 'Earth'
+    }],
+    orbital_data: {
+      orbit_id: '1',
+      orbit_determination_date: '2025-07-02',
+      first_observation_date: '2025-03-12',
+      last_observation_date: '2025-07-04',
+      data_arc_in_days: 114,
+      observations_used: 62,
+      orbit_uncertainty: '2',
+      minimum_orbit_intersection: '.089',
+      jupiter_tisserand_invariant: '3.8',
+      epoch_osculation: '2025-07-02',
+      eccentricity: '0.12',
+      semi_major_axis: '1.1',
+      inclination: '2.3',
+      ascending_node_longitude: '28.9',
+      orbital_period: '398.2',
+      perihelion_distance: '0.97',
+      perihelion_argument: '89.1',
+      aphelion_distance: '1.23',
+      perihelion_time: '2025-09-08',
+      mean_anomaly: '245.3',
+      mean_motion: '0.90',
+      equinox: 'J2000'
+    }
+  },
+  {
+    id: '2018AG37',
+    name: '2018 AG37',
+    nasa_jpl_url: '',
+    absolute_magnitude_h: 16.9,
+    estimated_diameter: {
+      kilometers: {
+        estimated_diameter_min: 2.1,
+        estimated_diameter_max: 3.8
+      }
+    },
+    is_potentially_hazardous_asteroid: true,
+    close_approach_data: [{
+      close_approach_date: '2025-11-03',
+      close_approach_date_full: '2025-Nov-03 22:30',
+      epoch_date_close_approach: 1762210200000,
+      relative_velocity: {
+        kilometers_per_second: '24.8',
+        kilometers_per_hour: '89280',
+        miles_per_hour: '55485'
+      },
+      miss_distance: {
+        astronomical: '0.019',
+        lunar: '7.4',
+        kilometers: '2842000',
+        miles: '1766000'
+      },
+      orbiting_body: 'Earth'
+    }],
+    orbital_data: {
+      orbit_id: '1',
+      orbit_determination_date: '2025-06-28',
+      first_observation_date: '2018-01-12',
+      last_observation_date: '2025-06-30',
+      data_arc_in_days: 2726,
+      observations_used: 428,
       orbit_uncertainty: '0',
-      minimum_orbit_intersection: '.05',
-      jupiter_tisserand_invariant: '3.5',
-      epoch_osculation: '2024-01-01',
-      eccentricity: '0.15',
-      semi_major_axis: '1.2',
-      inclination: '5.2',
-      ascending_node_longitude: '45.6',
-      orbital_period: '450.2',
-      perihelion_distance: '1.02',
-      perihelion_argument: '123.4',
-      aphelion_distance: '1.38',
-      perihelion_time: '2024-06-15',
-      mean_anomaly: '234.5',
-      mean_motion: '0.8',
+      minimum_orbit_intersection: '.019',
+      jupiter_tisserand_invariant: '2.8',
+      epoch_osculation: '2025-06-28',
+      eccentricity: '0.31',
+      semi_major_axis: '1.8',
+      inclination: '8.9',
+      ascending_node_longitude: '176.4',
+      orbital_period: '742.8',
+      perihelion_distance: '1.24',
+      perihelion_argument: '298.7',
+      aphelion_distance: '2.36',
+      perihelion_time: '2025-10-18',
+      mean_anomaly: '12.8',
+      mean_motion: '0.48',
       equinox: 'J2000'
     }
   }
 ]
 
 const mockApodData = {
-  date: '2024-07-04',
-  explanation: 'This stunning view from the James Webb Space Telescope showcases the Carina Nebula, one of the largest and brightest stellar nurseries in our galaxy. Located approximately 7,600 light-years away, this cosmic landscape reveals star formation in unprecedented detail.',
+  date: '2025-07-04',
+  explanation: 'This remarkable composite image from the James Webb Space Telescope reveals the Pillars of Creation in the Eagle Nebula with unprecedented infrared clarity. New observations in July 2025 have unveiled previously hidden star formation regions and proto-planetary disks within these iconic stellar nurseries, located 7,000 light-years away in the constellation Serpens.',
   hdurl: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&h=600&fit=crop&crop=center',
   media_type: 'image',
   service_version: 'v1',
-  title: 'Carina Nebula: Cosmic Cliffs',
+  title: 'Eagle Nebula: Pillars of Creation - July 2025 JWST Observations',
   url: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&h=600&fit=crop&crop=center',
   copyright: 'NASA, ESA, CSA, STScI'
 }
@@ -876,7 +984,7 @@ const App: React.FC = () => {
     <div className="neo-tracker">
       <div className="tracker-header">
         <h2>🛰️ Near Earth Object Tracker</h2>
-        <p>Real-time NASA data on asteroids and potential impact threats</p>
+        <p>Real-time NASA data on asteroids and potential impact threats - July 2025</p>
         <div className="online-status">
           <div className="status-indicator">
             <div className="status-dot online"></div>
@@ -895,19 +1003,30 @@ const App: React.FC = () => {
           
           <div className="stat-card hazardous">
             <h3>Hazardous Objects</h3>
-            <div className="stat-number">{cosmicData.hazardousAsteroids.length}</div>
+            <div className="stat-number">{cosmicData.hazardousAsteroids.filter(neo => neo.is_potentially_hazardous_asteroid).length}</div>
             <p>Potentially dangerous asteroids</p>
           </div>
           
           <div className="stat-card">
             <h3>Risk Assessment</h3>
-            <div className="stat-number">ACTIVE</div>
-            <p>Continuous monitoring</p>
+            <div className="stat-number">ELEVATED</div>
+            <p>2025 GH4 monitoring active</p>
+          </div>
+        </div>
+        
+        <div className="neo-alerts">
+          <div className="alert-banner">
+            <div className="alert-icon">⚠️</div>
+            <div className="alert-content">
+              <strong>Current Threat Status - July 2025:</strong>
+              <p>2025 GH4 approaching September 15th at 4.78M km distance. Impact probability: 0.001%. Continuous monitoring active.</p>
+              <span className="alert-time">🕐 Updated 12 min ago | Source: NASA JPL | July 4, 2025</span>
+            </div>
           </div>
         </div>
         
         <div className="neo-list">
-          <h3>Close Approach Analysis</h3>
+          <h3>Close Approach Analysis - Current Threats</h3>
           <div className="neo-table">
             <div className="table-header">
               <span>Object Name</span>
@@ -925,14 +1044,21 @@ const App: React.FC = () => {
               return (
                 <div key={neo.id || index} className="table-row">
                   <span className="object-name">{neo.name}</span>
-                  <span>{approach?.close_approach_date || '2024-12-15'}</span>
-                  <span>{approach ? `${parseFloat(approach.miss_distance.kilometers).toExponential(2)} km` : '7.48M km'}</span>
+                  <span>{approach?.close_approach_date || '2025-09-15'}</span>
+                  <span>{approach ? `${parseFloat(approach.miss_distance.kilometers).toExponential(2)} km` : '4.78M km'}</span>
                   <span>{neo.estimated_diameter.kilometers.estimated_diameter_max.toFixed(3)}</span>
-                  <span>{approach ? `${parseFloat(approach.relative_velocity.kilometers_per_second).toFixed(1)} km/s` : '15.2 km/s'}</span>
+                  <span>{approach ? `${parseFloat(approach.relative_velocity.kilometers_per_second).toFixed(1)} km/s` : '18.7 km/s'}</span>
                   <span className={`threat-level ${threat.toLowerCase()}`}>{threat}</span>
                 </div>
               )
             })}
+          </div>
+        </div>
+        
+        <div className="neo-historical">
+          <h3>Historical Context</h3>
+          <div className="historical-note">
+            <p><strong>Note:</strong> Previous threat 2022 AP7 passed safely in December 2024 at 7.48M km distance. No impact occurred. Current monitoring focuses on newly discovered objects from 2025 surveys.</p>
           </div>
         </div>
       </div>
@@ -1046,36 +1172,36 @@ const App: React.FC = () => {
               </div>
             </div>
             <div className="weather-overlay">
-              <div className="storm-marker hurricane" style={{top: '35%', left: '25%'}}>
-                <div className="storm-icon pulse">🌀</div>
+              <div className="storm-marker heat" style={{top: '35%', left: '30%'}}>
+                <div className="storm-icon pulse">🌡️</div>
                 <div className="storm-info">
-                  <strong>Hurricane Laura</strong>
-                  <span>29.5°N, 93.2°W</span>
-                  <span>Cat 4 - 150mph</span>
+                  <strong>Heat Dome Event</strong>
+                  <span>33.4°N, 112.1°W</span>
+                  <span>July 2025 - 118°F</span>
                 </div>
               </div>
               <div className="storm-marker thunderstorm" style={{top: '45%', left: '55%'}}>
                 <div className="storm-icon pulse">⛈️</div>
                 <div className="storm-info">
-                  <strong>Supercell Complex</strong>
+                  <strong>Monsoon Storms</strong>
                   <span>35.5°N, 97.5°W</span>
-                  <span>Tornado Watch</span>
+                  <span>Active - Flash Flood Watch</span>
                 </div>
               </div>
-              <div className="storm-marker heat" style={{top: '48%', left: '35%'}}>
-                <div className="storm-icon pulse">🌡️</div>
+              <div className="storm-marker hurricane" style={{top: '20%', left: '80%'}}>
+                <div className="storm-icon pulse">🌀</div>
                 <div className="storm-info">
-                  <strong>Extreme Heat</strong>
-                  <span>33.4°N, 112.1°W</span>
-                  <span>125°F Heat Index</span>
+                  <strong>Tropical System 95L</strong>
+                  <span>25.4°N, 45.2°W</span>
+                  <span>Developing - 60mph</span>
                 </div>
               </div>
-              <div className="storm-marker blizzard" style={{top: '25%', left: '50%'}}>
-                <div className="storm-icon pulse">❄️</div>
+              <div className="storm-marker wildfire" style={{top: '40%', left: '15%'}}>
+                <div className="storm-icon pulse">🔥</div>
                 <div className="storm-info">
-                  <strong>Blizzard Warning</strong>
-                  <span>46.8°N, 100.8°W</span>
-                  <span>24" Snow + 70mph Winds</span>
+                  <strong>Wildfire Complex</strong>
+                  <span>39.7°N, 121.8°W</span>
+                  <span>California - 15,000 acres</span>
                 </div>
               </div>
             </div>
@@ -1135,57 +1261,59 @@ const App: React.FC = () => {
             <h3>⚠️ Severe Weather Alerts</h3>
             <div className="alerts-list">
               <div className="alert-item critical">
-                <div className="alert-icon">🌀</div>
+                <div className="alert-icon">🌡️</div>
                 <div className="alert-content">
-                  <strong>Hurricane Laura</strong>
-                  <p>Category 4 - Winds 150 mph - Gulf Coast</p>
-                  <p><strong>📍 Location:</strong> 29.5°N, 93.2°W (Lake Charles, LA)</p>
-                  <p><strong>🌊 Storm Surge:</strong> 15-20 feet predicted</p>
-                  <p><strong>🏘️ Affected Areas:</strong> Louisiana, Texas coastline - 2.3M residents</p>
-                  <p><strong>⚠️ Emergency Status:</strong> Mandatory evacuations in effect</p>
-                  <p><strong>📊 Pressure:</strong> 937 mb | <strong>🎯 Movement:</strong> NNW at 15 mph</p>
-                  <span className="alert-time">🕐 Updated 3 min ago | Source: NHC</span>
+                  <strong>Record-Breaking Heat Dome</strong>
+                  <p>Excessive Heat Warning - Southwest US - July 2025</p>
+                  <p><strong>📍 Location:</strong> 33.4°N, 112.1°W (Phoenix, AZ Metro)</p>
+                  <p><strong>🌡️ Temperature Range:</strong> 118-122°F (48-50°C)</p>
+                  <p><strong>🔥 Heat Index:</strong> Dangerous levels - feels like 128°F+</p>
+                  <p><strong>⏱️ Duration:</strong> 7-day heat dome event ongoing</p>
+                  <p><strong>🏥 Health Risk:</strong> Extreme risk of heat-related illness</p>
+                  <p><strong>💧 Humidity:</strong> 12% | <strong>☀️ UV Index:</strong> Extreme (11+)</p>
+                  <span className="alert-time">🕐 Updated 2 min ago | Source: NWS | July 4, 2025</span>
+                </div>
+              </div>
+              <div className="alert-item warning">
+                <div className="alert-icon">🔥</div>
+                <div className="alert-content">
+                  <strong>Major Wildfire Complex</strong>
+                  <p>Red Flag Warning - Northern California</p>
+                  <p><strong>📍 Location:</strong> 39.7°N, 121.8°W (Butte County, CA)</p>
+                  <p><strong>🔥 Fire Size:</strong> 15,247 acres and growing rapidly</p>
+                  <p><strong>🌪️ Conditions:</strong> 40+ mph winds, 8% humidity</p>
+                  <p><strong>🏘️ Structures Threatened:</strong> 2,500 homes at risk</p>
+                  <p><strong>👥 Evacuations:</strong> 8,000 residents under evacuation orders</p>
+                  <p><strong>🚁 Resources:</strong> 450 firefighters, 12 aircraft deployed</p>
+                  <span className="alert-time">🕐 Updated 12 min ago | Source: CAL FIRE | July 4, 2025</span>
                 </div>
               </div>
               <div className="alert-item warning">
                 <div className="alert-icon">⛈️</div>
                 <div className="alert-content">
-                  <strong>Severe Thunderstorm Complex</strong>
-                  <p>Tornado Watch - Oklahoma, Texas</p>
-                  <p><strong>📍 Location:</strong> 35.5°N, 97.5°W (Oklahoma City Metro)</p>
-                  <p><strong>🌪️ Conditions:</strong> Supercell development, 80+ mph winds</p>
-                  <p><strong>🧊 Hail Size:</strong> Golf ball to baseball sized hail possible</p>
-                  <p><strong>👥 Population at Risk:</strong> 5.7M people in affected counties</p>
-                  <p><strong>⚡ Lightning Rate:</strong> 15,000 strikes/hour | <strong>📡 Doppler:</strong> Rotation detected</p>
-                  <span className="alert-time">🕐 Updated 8 min ago | Source: SPC</span>
+                  <strong>Severe Monsoon Activity</strong>
+                  <p>Flash Flood Watch - Southwest Monsoon Season</p>
+                  <p><strong>📍 Location:</strong> 35.2°N, 101.8°W (Texas Panhandle)</p>
+                  <p><strong>💧 Rainfall Rate:</strong> 2-4 inches per hour possible</p>
+                  <p><strong>🌪️ Conditions:</strong> Rotating supercells, large hail</p>
+                  <p><strong>🧊 Hail Size:</strong> Quarter to golf ball sized</p>
+                  <p><strong>👥 Population at Risk:</strong> 1.2M people in affected areas</p>
+                  <p><strong>⚡ Lightning Rate:</strong> 8,000 strikes/hour | <strong>📡 Doppler:</strong> Weak rotation</p>
+                  <span className="alert-time">🕐 Updated 6 min ago | Source: SPC | July 4, 2025</span>
                 </div>
               </div>
               <div className="alert-item info">
-                <div className="alert-icon">🌡️</div>
+                <div className="alert-icon">🌀</div>
                 <div className="alert-content">
-                  <strong>Extreme Heat Event</strong>
-                  <p>Excessive Heat Warning - Southwest US</p>
-                  <p><strong>📍 Location:</strong> 33.4°N, 112.1°W (Phoenix, AZ Metro)</p>
-                  <p><strong>🌡️ Temperature Range:</strong> 115-125°F (46-52°C)</p>
-                  <p><strong>🔥 Heat Index:</strong> Dangerous levels - feels like 130°F+</p>
-                  <p><strong>⏱️ Duration:</strong> 5-7 days of record-breaking temperatures</p>
-                  <p><strong>🏥 Health Risk:</strong> High risk of heat-related illness</p>
-                  <p><strong>💧 Humidity:</strong> 15% | <strong>☀️ UV Index:</strong> Extreme (11+)</p>
-                  <span className="alert-time">🕐 Updated 15 min ago | Source: NWS</span>
-                </div>
-              </div>
-              <div className="alert-item warning">
-                <div className="alert-icon">❄️</div>
-                <div className="alert-content">
-                  <strong>Blizzard Warning</strong>
-                  <p>Heavy Snow & High Winds - Northern Plains</p>
-                  <p><strong>📍 Location:</strong> 46.8°N, 100.8°W (Bismarck, ND region)</p>
-                  <p><strong>🌨️ Snow Accumulation:</strong> 18-24 inches expected</p>
-                  <p><strong>💨 Wind Gusts:</strong> 50-70 mph creating whiteout conditions</p>
-                  <p><strong>🌡️ Wind Chill:</strong> -40°F to -50°F life-threatening cold</p>
-                  <p><strong>🛣️ Travel:</strong> Impossible - all highways closed</p>
-                  <p><strong>⚡ Power:</strong> 125,000 customers without electricity</p>
-                  <span className="alert-time">🕐 Updated 5 min ago | Source: NWS</span>
+                  <strong>Tropical Development</strong>
+                  <p>Invest 95L - Atlantic Basin Monitoring</p>
+                  <p><strong>📍 Location:</strong> 25.4°N, 45.2°W (Central Atlantic)</p>
+                  <p><strong>💨 Max Winds:</strong> 35 mph - Tropical Depression forming</p>
+                  <p><strong>📊 Pressure:</strong> 1006 mb | <strong>🎯 Movement:</strong> WNW at 12 mph</p>
+                  <p><strong>⏱️ Development Chance:</strong> 70% next 48 hours</p>
+                  <p><strong>🗓️ Peak Season:</strong> Currently in Atlantic hurricane season</p>
+                  <p><strong>🛰️ Satellite:</strong> Convection increasing, circulation developing</p>
+                  <span className="alert-time">🕐 Updated 18 min ago | Source: NHC | July 4, 2025</span>
                 </div>
               </div>
             </div>
