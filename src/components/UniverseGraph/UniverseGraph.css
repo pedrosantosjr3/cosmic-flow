@@ -602,7 +602,8 @@
 }
 
 .zoom-buttons {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
   margin-top: 8px;
 }
@@ -610,28 +611,70 @@
 .zoom-btn {
   background: rgba(102, 126, 234, 0.2);
   border: 1px solid rgba(102, 126, 234, 0.4);
-  border-radius: 6px;
-  padding: 6px 10px;
+  border-radius: 8px;
+  padding: 8px 12px;
   color: #667eea;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  flex: 1;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .zoom-btn:hover {
-  background: rgba(102, 126, 234, 0.3);
-  transform: translateY(-1px);
+  background: rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.zoom-btn.zoom-in {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #22c55e;
+}
+
+.zoom-btn.zoom-in:hover {
+  background: rgba(34, 197, 94, 0.3);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.zoom-btn.zoom-out {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+.zoom-btn.zoom-out:hover {
+  background: rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .zoom-btn.reset {
   background: rgba(255, 165, 2, 0.2);
   border-color: rgba(255, 165, 2, 0.4);
   color: #FFA502;
+  grid-column: 1;
 }
 
 .zoom-btn.reset:hover {
   background: rgba(255, 165, 2, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 165, 2, 0.3);
+}
+
+.zoom-btn.fit-view {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: rgba(168, 85, 247, 0.4);
+  color: #a855f7;
+  grid-column: 2;
+}
+
+.zoom-btn.fit-view:hover {
+  background: rgba(168, 85, 247, 0.3);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
 }
 
 .stats-display {

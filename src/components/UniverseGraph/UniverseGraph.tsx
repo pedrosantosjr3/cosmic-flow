@@ -91,6 +91,34 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  // Handle keyboard shortcuts for zoom
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!svgRef.current || !zoomRef.current) return
+      
+      const svg = d3.select(svgRef.current)
+      
+      // Zoom in with + or =
+      if ((event.key === '=' || event.key === '+') && !event.ctrlKey) {
+        event.preventDefault()
+        svg.transition().duration(300).call(zoomRef.current.scaleBy, 1.5)
+      }
+      // Zoom out with -
+      else if (event.key === '-' && !event.ctrlKey) {
+        event.preventDefault()
+        svg.transition().duration(300).call(zoomRef.current.scaleBy, 0.67)
+      }
+      // Reset with 0
+      else if (event.key === '0' && !event.ctrlKey) {
+        event.preventDefault()
+        svg.transition().duration(500).call(zoomRef.current.transform, d3.zoomIdentity)
+      }
+    }
+    
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   // Handle click outside to close properties panel
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -1357,6 +1385,7 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
               
               <div className="zoom-controls">
                 <label>🔍 Zoom Level: {zoomLevel.toFixed(1)}x</label>
+                <p style={{fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', margin: '4px 0 8px 0'}}>Keys: +/- zoom, 0 reset, scroll wheel</p>
                 <div className="zoom-buttons">
                   <button 
                     onClick={() => {
@@ -1408,6 +1437,18 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                 <div className="stat-item">
                   <span className="stat-label">Total Objects:</span>
                   <span className="stat-value">{nodes.length}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Zoom Level:</span>
+                  <span className="stat-value">{(zoomLevel * 100).toFixed(0)}%</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">View Mode:</span>
+                  <span className="stat-value">
+                    {zoomLevel < 0.3 ? 'Overview' : 
+                     zoomLevel < 1 ? 'Normal' : 
+                     zoomLevel < 3 ? 'Detailed' : 'Close-up'}
+                  </span>
                 </div>
                 <div className="stat-item">
                   <span className="stat-label">Scale Representation:</span>
