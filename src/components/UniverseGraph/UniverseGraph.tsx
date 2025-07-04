@@ -63,9 +63,6 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
   const [loading, setLoading] = useState(true)
   const [selectedNode, setSelectedNode] = useState<UniverseNode | null>(null)
   const [dimensions, setDimensions] = useState({ width: 1200, height: 800 })
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState<string>('')
-  const [showControls, setShowControls] = useState(true)
   const [zoomLevel, setZoomLevel] = useState(1)
 
   // Initialize universe data
@@ -766,16 +763,9 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
     }, 10) // Ultra fast loading
   }
 
-  // Filter nodes based on selected category, search term, and filter type
+  // Filter nodes based on selected category only
   const filteredNodes = nodes.filter(node => {
-    const matchesCategory = !selectedCategory || node.type === selectedCategory
-    const matchesFilter = !filterType || node.type === filterType
-    const matchesSearch = !searchTerm || 
-      node.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      node.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (node.facts?.description && node.facts.description.toLowerCase().includes(searchTerm.toLowerCase()))
-    
-    return matchesCategory && matchesFilter && matchesSearch
+    return !selectedCategory || node.type === selectedCategory
   })
 
   // Update D3 visualization
@@ -1361,247 +1351,53 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
 
   return (
     <div className="universe-graph-container" ref={containerRef}>
-      {/* Enhanced NASA-style navigation controls */}
-      <div className={`graph-controls ${showControls ? 'expanded' : 'collapsed'}`}>
-        <div className="controls-header">
-          <h3>🌌 Universe Explorer</h3>
+      {/* Simple zoom overlay - clean and minimal */}
+      <div className="zoom-overlay">
+        <div className="zoom-controls-simple">
           <button 
-            className="toggle-controls-btn"
-            onClick={() => setShowControls(!showControls)}
-            aria-label="Toggle controls"
+            onClick={() => {
+              if (svgRef.current && zoomRef.current) {
+                const svg = d3.select(svgRef.current)
+                svg.transition().duration(300).ease(d3.easeQuadOut).call(
+                  zoomRef.current.scaleBy, 1.5
+                )
+              }
+            }}
+            className="zoom-btn-simple zoom-in"
+            title="Zoom in"
           >
-            {showControls ? '−' : '+'}
+            +
+          </button>
+          <span className="zoom-level-display">{(zoomLevel * 100).toFixed(0)}%</span>
+          <button 
+            onClick={() => {
+              if (svgRef.current && zoomRef.current) {
+                const svg = d3.select(svgRef.current)
+                svg.transition().duration(300).ease(d3.easeQuadOut).call(
+                  zoomRef.current.scaleBy, 0.67
+                )
+              }
+            }}
+            className="zoom-btn-simple zoom-out"
+            title="Zoom out"
+          >
+            −
+          </button>
+          <button 
+            onClick={() => {
+              if (svgRef.current && zoomRef.current) {
+                const svg = d3.select(svgRef.current)
+                svg.transition().duration(500).ease(d3.easeQuadInOut).call(
+                  zoomRef.current.transform, d3.zoomIdentity
+                )
+              }
+            }}
+            className="zoom-btn-simple reset"
+            title="Reset view"
+          >
+            ⌂
           </button>
         </div>
-        
-        {showControls && (
-          <>
-            <p>Interactive visualization of cosmic objects and their relationships</p>
-            
-            {/* NASA-style search and filter controls */}
-            <div className="navigation-controls">
-              <div className="search-section">
-                <label htmlFor="object-search">🔍 Search Objects:</label>
-                <input
-                  id="object-search"
-                  type="text"
-                  placeholder="Search by name, type, or description..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
-                />
-              </div>
-              
-              <div className="filter-section">
-                <label htmlFor="object-filter">🎯 Filter by Type:</label>
-                <select
-                  id="object-filter"
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="">All Objects</option>
-                  <option value="star">Stars</option>
-                  <option value="planet">Planets</option>
-                  <option value="moon">Moons</option>
-                  <option value="asteroid">Asteroids</option>
-                  <option value="exoplanet">Exoplanets</option>
-                  <option value="galaxy">Galaxies</option>
-                  <option value="nebula">Nebulae</option>
-                  <option value="dark-matter">Dark Matter</option>
-                  <option value="dark-energy">Dark Energy</option>
-                  <option value="quantum">Quantum Fields</option>
-                  <option value="spacetime">Spacetime</option>
-                </select>
-              </div>
-              
-              <div className="zoom-controls">
-                <label>🔍 Zoom Level: {zoomLevel.toFixed(1)}x</label>
-                <p style={{fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', margin: '4px 0 8px 0'}}>Keys: +/- zoom, 0 reset, scroll wheel</p>
-                <div className="zoom-buttons">
-                  <button 
-                    onClick={() => {
-                      if (svgRef.current && zoomRef.current) {
-                        const svg = d3.select(svgRef.current)
-                        svg.transition().duration(300).ease(d3.easeQuadOut).call(
-                          zoomRef.current.scaleBy, 1.5
-                        )
-                      }
-                    }}
-                    className="zoom-btn zoom-in"
-                    title="Zoom in for detailed view"
-                  >
-                    🔍+ Zoom In
-                  </button>
-                  <button 
-                    onClick={() => {
-                      if (svgRef.current && zoomRef.current) {
-                        const svg = d3.select(svgRef.current)
-                        svg.transition().duration(300).ease(d3.easeQuadOut).call(
-                          zoomRef.current.scaleBy, 0.67
-                        )
-                      }
-                    }}
-                    className="zoom-btn zoom-out"
-                    title="Zoom out for overview"
-                  >
-                    🔍− Zoom Out
-                  </button>
-                  <button 
-                    onClick={() => {
-                      if (svgRef.current && zoomRef.current) {
-                        const svg = d3.select(svgRef.current)
-                        svg.transition().duration(500).ease(d3.easeQuadInOut).call(
-                          zoomRef.current.transform, d3.zoomIdentity
-                        )
-                      }
-                    }}
-                    className="zoom-btn reset"
-                    title="Reset to default view"
-                  >
-                    🎯 Reset View
-                  </button>
-                  <button 
-                    onClick={() => {
-                      if (svgRef.current && zoomRef.current) {
-                        const svg = d3.select(svgRef.current)
-                        const container = svg.select('.zoom-container')
-                        try {
-                          const bounds = (container.node() as any)?.getBBox()
-                          if (bounds && bounds.width > 0 && bounds.height > 0) {
-                            const fullWidth = dimensions.width
-                            const fullHeight = dimensions.height
-                            const scale = Math.min(fullWidth / bounds.width, fullHeight / bounds.height) * 0.7
-                            const translateX = fullWidth / 2 - scale * (bounds.x + bounds.width / 2)
-                            const translateY = fullHeight / 2 - scale * (bounds.y + bounds.height / 2)
-                            
-                            svg.transition().duration(750).ease(d3.easeQuadInOut).call(
-                              zoomRef.current.transform,
-                              d3.zoomIdentity.translate(translateX, translateY).scale(scale)
-                            )
-                          } else {
-                            // Fallback to reset if bounds calculation fails
-                            svg.transition().duration(500).call(
-                              zoomRef.current.transform, d3.zoomIdentity
-                            )
-                          }
-                        } catch (error) {
-                          console.log('Fit all fallback to reset')
-                          svg.transition().duration(500).call(
-                            zoomRef.current.transform, d3.zoomIdentity
-                          )
-                        }
-                      }
-                    }}
-                    className="zoom-btn fit-view"
-                    title="Fit all objects to view"
-                  >
-                    🌌 Fit All
-                  </button>
-                </div>
-              </div>
-              
-              <div className="stats-display">
-                <div className="stat-item">
-                  <span className="stat-label">Visible Objects:</span>
-                  <span className="stat-value">{filteredNodes.length}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Total Objects:</span>
-                  <span className="stat-value">{nodes.length}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Zoom Level:</span>
-                  <span className="stat-value">{(zoomLevel * 100).toFixed(0)}%</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">View Mode:</span>
-                  <span className="stat-value">
-                    {zoomLevel < 0.3 ? 'Overview' : 
-                     zoomLevel < 1 ? 'Normal' : 
-                     zoomLevel < 3 ? 'Detailed' : 'Close-up'}
-                  </span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Scale Representation:</span>
-                  <span className="stat-value">Realistic Distances</span>
-                </div>
-              </div>
-              
-              <div className="scale-legend">
-                <h4>🌌 Cosmic Scale Guide</h4>
-                <div className="scale-items">
-                  <div className="scale-item">
-                    <span className="scale-color inner"></span>
-                    <span className="scale-text">Solar System (AU scale)</span>
-                  </div>
-                  <div className="scale-item">
-                    <span className="scale-color near"></span>
-                    <span className="scale-text">Nearby Stars (light-years)</span>
-                  </div>
-                  <div className="scale-item">
-                    <span className="scale-color cosmic"></span>
-                    <span className="scale-text">Cosmic Objects (deep space)</span>
-                  </div>
-                  <div className="scale-item">
-                    <span className="scale-color quantum"></span>
-                    <span className="scale-text">Quantum Fields (universal)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Enhanced legend with interactive elements */}
-            <div className="legend">
-              <h4>Object Types</h4>
-              <div className="legend-grid">
-                <div className="legend-item" onClick={() => setFilterType(filterType === 'star' ? '' : 'star')}>
-                  <div className="legend-color star"></div>
-                  <span>Stars</span>
-                </div>
-                <div className="legend-item" onClick={() => setFilterType(filterType === 'planet' ? '' : 'planet')}>
-                  <div className="legend-color planet"></div>
-                  <span>Planets</span>
-                </div>
-                <div className="legend-item" onClick={() => setFilterType(filterType === 'moon' ? '' : 'moon')}>
-                  <div className="legend-color moon"></div>
-                  <span>Moons</span>
-                </div>
-                <div className="legend-item" onClick={() => setFilterType(filterType === 'asteroid' ? '' : 'asteroid')}>
-                  <div className="legend-color asteroid"></div>
-                  <span>Asteroids</span>
-                </div>
-                <div className="legend-item" onClick={() => setFilterType(filterType === 'exoplanet' ? '' : 'exoplanet')}>
-                  <div className="legend-color exoplanet"></div>
-                  <span>Exoplanets</span>
-                </div>
-                <div className="legend-item" onClick={() => setFilterType(filterType === 'galaxy' ? '' : 'galaxy')}>
-                  <div className="legend-color galaxy"></div>
-                  <span>Galaxies</span>
-                </div>
-                <div className="legend-item" onClick={() => setFilterType(filterType === 'dark-matter' ? '' : 'dark-matter')}>
-                  <div className="legend-color quantum"></div>
-                  <span>Dark Matter</span>
-                </div>
-                <div className="legend-item">
-                  <div className="legend-color hazardous"></div>
-                  <span>Hazardous Objects</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Quick navigation shortcuts */}
-            <div className="quick-nav">
-              <h4>Quick Navigation</h4>
-              <div className="nav-buttons">
-                <button onClick={() => setSearchTerm('sun')} className="nav-btn">☀️ Solar System</button>
-                <button onClick={() => setSearchTerm('proxima')} className="nav-btn">🌟 Nearby Stars</button>
-                <button onClick={() => setSearchTerm('dark')} className="nav-btn">🌌 Dark Universe</button>
-                <button onClick={() => setSearchTerm('quantum')} className="nav-btn">⚛️ Quantum Fields</button>
-              </div>
-            </div>
-          </>
-        )}
       </div>
       
       <svg ref={svgRef} className="universe-graph-svg"></svg>
