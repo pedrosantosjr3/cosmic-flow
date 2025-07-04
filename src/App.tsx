@@ -250,8 +250,20 @@ const App: React.FC = () => {
   // Update background based on active tab
   useEffect(() => {
     updateBackground()
-    // Scroll to top when tab changes
+    // Scroll to top when tab changes - target both window and main content
     window.scrollTo({ top: 0, behavior: 'smooth' })
+    
+    // Also scroll main content container to top
+    const mainContent = document.querySelector('.main-content')
+    if (mainContent) {
+      mainContent.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+    
+    // Additional scroll for cosmos content specifically
+    const cosmosExplorer = document.querySelector('.cosmos-explorer')
+    if (cosmosExplorer && activeTab === 'cosmos') {
+      cosmosExplorer.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }, [activeTab])
 
   const loadCosmicDataWithFallback = async () => {

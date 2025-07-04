@@ -1,5 +1,16 @@
 /* Mobile-Specific Fixes for iPhone and Touch Devices */
 
+/* Fix cosmos tab scroll position */
+.cosmos-explorer {
+  scroll-behavior: smooth;
+  display: flex;
+  flex-direction: column;
+}
+
+.cosmos-content {
+  flex: 1;
+}
+
 /* Prevent zoom on input focus and improve touch handling */
 html {
   -webkit-text-size-adjust: 100%;
