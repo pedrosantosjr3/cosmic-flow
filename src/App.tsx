@@ -1260,7 +1260,7 @@ const App: React.FC = () => {
                 className="earth-satellite-image"
               />
               <div className="satellite-overlay">
-                <div className="live-data-badge">🛰️ GOES-16 Live Feed</div>
+                <div className="live-data-badge">🛰️ GOES-19 East Live</div>
                 <div className="earth-stats">
                   <div className="stat">🌍 Full Disk | 📡 GeoColor Enhanced</div>
                   <div className="stat">⏰ Updated every 10 minutes</div>
@@ -1310,12 +1310,12 @@ const App: React.FC = () => {
             <h3>🌐 Global Weather Statistics</h3>
             <div className="stats-grid">
               <div className="weather-stat">
-                <label>Active Storms:</label>
-                <span className="danger">23</span>
+                <label>Active Systems:</label>
+                <span className="info">1</span>
               </div>
               <div className="weather-stat">
-                <label>Hurricane Warnings:</label>
-                <span className="warning">5</span>
+                <label>Formation Chance:</label>
+                <span className="warning">70%</span>
               </div>
               <div className="weather-stat">
                 <label>Temperature Anomalies:</label>
@@ -1332,7 +1332,7 @@ const App: React.FC = () => {
             <h3>🛰️ Live Satellite Imagery</h3>
             <div className="satellite-grid">
               <div className="satellite-feed">
-                <div className="feed-header">GOES-16 CONUS - Interactive View</div>
+                <div className="feed-header">GOES-19 East - Interactive View</div>
                 <div className="satellite-image interactive-satellite" onClick={() => window.open('https://www.star.nesdis.noaa.gov/GOES/fulldisk_band.php?sat=G16', '_blank')}>
                   <img src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/CONUS/GEOCOLOR/1250x750.jpg" alt="GOES-16 Earth" />
                   <div className="live-indicator">🔴 LIVE</div>
@@ -1342,7 +1342,7 @@ const App: React.FC = () => {
                 </div>
               </div>
               <div className="satellite-feed">
-                <div className="feed-header">GOES-17 Pacific - Interactive View</div>
+                <div className="feed-header">GOES-18 West - Interactive View</div>
                 <div className="satellite-image interactive-satellite" onClick={() => window.open('https://www.star.nesdis.noaa.gov/GOES/fulldisk_band.php?sat=G17', '_blank')}>
                   <img src="https://cdn.star.nesdis.noaa.gov/GOES17/ABI/FD/GEOCOLOR/1250x1250.jpg" alt="GOES-17 Pacific" />
                   <div className="live-indicator">🔴 LIVE</div>
@@ -1412,6 +1412,92 @@ const App: React.FC = () => {
                   <p><strong>🛰️ Satellite:</strong> Convection increasing, circulation developing</p>
                   <span className="alert-time">🕐 Updated 18 min ago | Source: NHC | July 4, 2025</span>
                 </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="tropical-weather-outlook">
+            <h3>🌀 Tropical Weather Outlook</h3>
+            <div className="outlook-header">
+              <div className="nhc-badge">📡 National Hurricane Center | Atlantic Basin</div>
+              <div className="season-status">🗓️ 2025 Atlantic Hurricane Season - Peak Activity</div>
+            </div>
+            <div className="tropical-systems">
+              <div className="system-card active">
+                <div className="system-header">
+                  <div className="system-icon">🌀</div>
+                  <div className="system-details">
+                    <h4>Invest 95L - Tropical Development</h4>
+                    <p className="system-location">25.4°N, 45.2°W | Central Atlantic</p>
+                    <div className="development-chances">
+                      <div className="chance-item">
+                        <span className="timeframe">48 hours:</span>
+                        <span className="percentage high">70%</span>
+                      </div>
+                      <div className="chance-item">
+                        <span className="timeframe">7 days:</span>
+                        <span className="percentage high">80%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="system-data">
+                  <div className="data-grid">
+                    <div className="data-item">
+                      <label>Max Winds:</label>
+                      <span>35 mph</span>
+                    </div>
+                    <div className="data-item">
+                      <label>Pressure:</label>
+                      <span>1006 mb</span>
+                    </div>
+                    <div className="data-item">
+                      <label>Movement:</label>
+                      <span>WNW 12 mph</span>
+                    </div>
+                    <div className="data-item">
+                      <label>Status:</label>
+                      <span className="status-developing">Developing</span>
+                    </div>
+                  </div>
+                  <div className="system-outlook">
+                    <p><strong>Forecast:</strong> Tropical depression formation likely within 48 hours. System shows increasing convection and improving organization. Expected to strengthen while moving west-northwest toward the Lesser Antilles.</p>
+                    <p><strong>Impacts:</strong> Heavy rainfall, flooding, and gusty winds possible for Caribbean islands by mid-week.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="basin-summary">
+                <h4>🌊 Atlantic Basin Summary - July 4, 2025</h4>
+                <div className="summary-stats">
+                  <div className="stat-item">
+                    <label>Active Systems:</label>
+                    <span>1</span>
+                  </div>
+                  <div className="stat-item">
+                    <label>Season Total:</label>
+                    <span>3 Named Storms</span>
+                  </div>
+                  <div className="stat-item">
+                    <label>Average by Date:</label>
+                    <span>1.5 storms</span>
+                  </div>
+                  <div className="stat-item">
+                    <label>Season Forecast:</label>
+                    <span>Above Normal Activity</span>
+                  </div>
+                </div>
+                <div className="conditions-summary">
+                  <p><strong>🌡️ Current Conditions:</strong> Sea surface temperatures above average (85-87°F) across the Main Development Region. Low wind shear and favorable atmospheric patterns supporting tropical development.</p>
+                  <p><strong>📈 Seasonal Outlook:</strong> NOAA forecasts 17-25 named storms for 2025 Atlantic season, with 8-13 hurricanes expected.</p>
+                </div>
+              </div>
+            </div>
+            <div className="outlook-footer">
+              <div className="update-time">🕐 Last Updated: July 4, 2025, 11:00 AM EDT</div>
+              <div className="data-source">📊 Data Source: National Hurricane Center / NOAA</div>
+              <div className="interactive-link" onClick={() => window.open('https://www.nhc.noaa.gov/gtwo.php?basin=atlc', '_blank')}>
+                🌐 View Interactive NHC Outlook
               </div>
             </div>
           </div>

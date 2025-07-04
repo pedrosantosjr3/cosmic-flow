@@ -3907,3 +3907,279 @@
   border: 1px solid rgba(0, 255, 0, 0.4);
   color: #00ff00;
 }
+
+/* Tropical Weather Outlook Styles */
+.tropical-weather-outlook {
+  background: linear-gradient(135deg, rgba(15, 20, 40, 0.9), rgba(30, 50, 70, 0.8));
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 15px;
+  padding: 25px;
+  margin-top: 25px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.tropical-weather-outlook h3 {
+  color: #00d4ff;
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.outlook-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.nhc-badge, .season-status {
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #00d4ff;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.tropical-systems {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.system-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 165, 2, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.system-card.active {
+  border-color: rgba(255, 165, 2, 0.6);
+  box-shadow: 0 4px 20px rgba(255, 165, 2, 0.2);
+}
+
+.system-header {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.system-icon {
+  font-size: 2rem;
+  animation: hurricane-spin 4s linear infinite;
+}
+
+.system-details h4 {
+  color: #FFA502;
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+}
+
+.system-location {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.development-chances {
+  display: flex;
+  gap: 15px;
+}
+
+.chance-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.timeframe {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.percentage {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.percentage.high {
+  color: #ff6b6b;
+}
+
+.percentage.medium {
+  color: #FFA502;
+}
+
+.percentage.low {
+  color: #2ed573;
+}
+
+.system-data {
+  border-top: 1px solid rgba(255, 165, 2, 0.3);
+  padding-top: 15px;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.data-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.data-item label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.data-item span {
+  font-weight: 600;
+  color: white;
+}
+
+.status-developing {
+  color: #FFA502;
+  background: rgba(255, 165, 2, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.system-outlook {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.system-outlook p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.basin-summary {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.basin-summary h4 {
+  color: #667eea;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-item label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.stat-item span {
+  font-weight: 600;
+  color: white;
+}
+
+.conditions-summary p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.outlook-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.update-time, .data-source {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.interactive-link {
+  background: rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #667eea;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.interactive-link:hover {
+  background: rgba(102, 126, 234, 0.3);
+  transform: translateY(-2px);
+}
+
+@keyframes hurricane-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mobile responsiveness for tropical outlook */
+@media (max-width: 768px) {
+  .outlook-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .nhc-badge, .season-status {
+    text-align: center;
+  }
+  
+  .development-chances {
+    justify-content: center;
+  }
+  
+  .data-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .summary-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .outlook-footer {
+    flex-direction: column;
+    text-align: center;
+  }
+}

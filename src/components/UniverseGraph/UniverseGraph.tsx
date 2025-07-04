@@ -62,6 +62,10 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
   const [loading, setLoading] = useState(true)
   const [selectedNode, setSelectedNode] = useState<UniverseNode | null>(null)
   const [dimensions, setDimensions] = useState({ width: 1200, height: 800 })
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterType, setFilterType] = useState<string>('')
+  const [showControls, setShowControls] = useState(true)
+  const [zoomLevel, setZoomLevel] = useState(1)
 
   // Initialize universe data
   useEffect(() => {
@@ -727,10 +731,17 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
     }, 10) // Ultra fast loading
   }
 
-  // Filter nodes based on selected category
-  const filteredNodes = selectedCategory 
-    ? nodes.filter(node => node.type === selectedCategory)
-    : nodes
+  // Filter nodes based on selected category, search term, and filter type
+  const filteredNodes = nodes.filter(node => {
+    const matchesCategory = !selectedCategory || node.type === selectedCategory
+    const matchesFilter = !filterType || node.type === filterType
+    const matchesSearch = !searchTerm || 
+      node.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      node.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (node.facts?.description && node.facts.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    
+    return matchesCategory && matchesFilter && matchesSearch
+  })
 
   // Update D3 visualization
   useEffect(() => {
@@ -753,11 +764,22 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       .force('center', d3.forceCenter(width / 2, height / 2))
       .force('collision', d3.forceCollide().radius((d: any) => d.size + 5))
 
-    // Create zoom behavior
+    // Create zoom behavior with enhanced controls
     const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.1, 4])
+      .scaleExtent([0.1, 8])
       .on('zoom', (event) => {
         container.attr('transform', event.transform)
+        setZoomLevel(event.transform.k)
+        
+        // Adaptive label visibility based on zoom level
+        const labels = container.selectAll('text')
+        if (event.transform.k < 0.5) {
+          labels.style('opacity', 0)
+        } else if (event.transform.k < 1) {
+          labels.style('opacity', 0.5)
+        } else {
+          labels.style('opacity', 1)
+        }
       })
 
     svg.call(zoom)
@@ -835,15 +857,42 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
     createQuantumFieldGradient('quantum-field', '#00cec9', '#81ecec', '#00b894')
     createQuantumFieldGradient('spacetime-field', '#fd79a8', '#fdcb6e', '#e17055')
 
-    // Add atmospheric glow effects
+    // Add enhanced atmospheric glow effects with multiple layers
     const createAtmosphereGlow = (id: string, color: string) => {
       const atmosphereGradient = defs.append('radialGradient')
         .attr('id', id + '-atmosphere')
         .attr('cx', '50%').attr('cy', '50%')
-        .attr('r', '60%')
+        .attr('r', '80%')
       atmosphereGradient.append('stop').attr('offset', '0%').attr('stop-color', color).attr('stop-opacity', 0)
-      atmosphereGradient.append('stop').attr('offset', '70%').attr('stop-color', color).attr('stop-opacity', 0.1)
-      atmosphereGradient.append('stop').attr('offset', '100%').attr('stop-color', color).attr('stop-opacity', 0.3)
+      atmosphereGradient.append('stop').attr('offset', '40%').attr('stop-color', color).attr('stop-opacity', 0.05)
+      atmosphereGradient.append('stop').attr('offset', '70%').attr('stop-color', color).attr('stop-opacity', 0.15)
+      atmosphereGradient.append('stop').attr('offset', '90%').attr('stop-color', color).attr('stop-opacity', 0.25)
+      atmosphereGradient.append('stop').attr('offset', '100%').attr('stop-color', color).attr('stop-opacity', 0.4)
+    }
+
+    // Create stellar corona effects for stars
+    const createStellarCorona = (id: string, color1: string, color2: string) => {
+      const coronaGradient = defs.append('radialGradient')
+        .attr('id', id + '-corona')
+        .attr('cx', '30%').attr('cy', '30%')
+        .attr('r', '120%')
+      coronaGradient.append('stop').attr('offset', '0%').attr('stop-color', color1).attr('stop-opacity', 0.8)
+      coronaGradient.append('stop').attr('offset', '30%').attr('stop-color', color2).attr('stop-opacity', 0.4)
+      coronaGradient.append('stop').attr('offset', '60%').attr('stop-color', color1).attr('stop-opacity', 0.2)
+      coronaGradient.append('stop').attr('offset', '100%').attr('stop-color', color2).attr('stop-opacity', 0.05)
+    }
+
+    // Create ring system gradients for planets with rings
+    const createRingSystem = (id: string, color: string) => {
+      const ringGradient = defs.append('linearGradient')
+        .attr('id', id + '-rings')
+        .attr('x1', '0%').attr('y1', '0%')
+        .attr('x2', '100%').attr('y2', '0%')
+      ringGradient.append('stop').attr('offset', '0%').attr('stop-color', color).attr('stop-opacity', 0)
+      ringGradient.append('stop').attr('offset', '30%').attr('stop-color', color).attr('stop-opacity', 0.3)
+      ringGradient.append('stop').attr('offset', '50%').attr('stop-color', color).attr('stop-opacity', 0.6)
+      ringGradient.append('stop').attr('offset', '70%').attr('stop-color', color).attr('stop-opacity', 0.3)
+      ringGradient.append('stop').attr('offset', '100%').attr('stop-color', color).attr('stop-opacity', 0)
     }
 
     createAtmosphereGlow('earth', '#4A90E2')
@@ -853,6 +902,14 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
     createAtmosphereGlow('saturn', '#F4A460')
     createAtmosphereGlow('uranus', '#4FD0E3')
     createAtmosphereGlow('neptune', '#4169E1')
+
+    // Create stellar coronas for enhanced star visualization
+    createStellarCorona('sun', '#FFD700', '#FF4500')
+    createStellarCorona('star', '#FFD700', '#FF6347')
+
+    // Create ring systems for planets with rings
+    createRingSystem('saturn', '#F4A460')
+    createRingSystem('uranus', '#4FD0E3')
 
     // Add glow filters
     const glowFilter = defs.append('filter')
@@ -895,12 +952,41 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       .attr('class', 'node')
       .style('cursor', 'pointer')
 
+    // Add stellar coronas for stars
+    node.filter((d: any) => d.type === 'star')
+      .append('circle')
+      .attr('r', (d: any) => d.size * 1.8)
+      .attr('fill', (d: any) => d.id === 'sun' ? 'url(#sun-corona)' : 'url(#star-corona)')
+      .attr('pointer-events', 'none')
+      .attr('opacity', 0.6)
+      .style('animation', 'stellar-pulse 4s ease-in-out infinite')
+
     // Add atmospheric glow for planets with atmospheres
     node.filter((d: any) => ['earth', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'].includes(d.id))
       .append('circle')
       .attr('r', (d: any) => d.size * 1.4)
       .attr('fill', (d: any) => `url(#${d.id}-atmosphere)`)
       .attr('pointer-events', 'none')
+
+    // Add ring systems for Saturn and Uranus
+    node.filter((d: any) => ['saturn', 'uranus'].includes(d.id))
+      .each(function(d: any) {
+        const ringNode = d3.select(this)
+        
+        // Create multiple ring layers for realistic appearance
+        for (let i = 1; i <= 3; i++) {
+          ringNode.append('ellipse')
+            .attr('rx', d.size * (1.5 + i * 0.3))
+            .attr('ry', d.size * (0.3 + i * 0.1))
+            .attr('fill', 'none')
+            .attr('stroke', `url(#${d.id}-rings)`)
+            .attr('stroke-width', 2)
+            .attr('opacity', 0.4 / i)
+            .attr('pointer-events', 'none')
+            .style('transform', `rotate(${10 + i * 5}deg)`)
+            .style('animation', `ring-rotation-${i} ${20 + i * 5}s linear infinite`)
+        }
+      })
 
     // Add quantum field visualizations (multiple layered circles for field effect)
     const quantumTypes = ['dark-matter', 'dark-energy', 'quantum', 'spacetime']
@@ -1079,32 +1165,165 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
 
   return (
     <div className="universe-graph-container" ref={containerRef}>
-      <div className="graph-controls">
-        <h3>Universe Dependency Graph</h3>
-        <p>Interactive visualization of cosmic objects and their relationships</p>
-        <div className="legend">
-          <div className="legend-item">
-            <div className="legend-color star"></div>
-            <span>Stars</span>
-          </div>
-          <div className="legend-item">
-            <div className="legend-color planet"></div>
-            <span>Planets</span>
-          </div>
-          <div className="legend-item">
-            <div className="legend-color moon"></div>
-            <span>Moons</span>
-          </div>
-          <div className="legend-item">
-            <div className="legend-color asteroid"></div>
-            <span>Asteroids</span>
-          </div>
-          <div className="legend-item">
-            <div className="legend-color hazardous"></div>
-            <span>Hazardous Objects</span>
-          </div>
+      {/* Enhanced NASA-style navigation controls */}
+      <div className={`graph-controls ${showControls ? 'expanded' : 'collapsed'}`}>
+        <div className="controls-header">
+          <h3>🌌 Universe Explorer</h3>
+          <button 
+            className="toggle-controls-btn"
+            onClick={() => setShowControls(!showControls)}
+            aria-label="Toggle controls"
+          >
+            {showControls ? '−' : '+'}
+          </button>
         </div>
+        
+        {showControls && (
+          <>
+            <p>Interactive visualization of cosmic objects and their relationships</p>
+            
+            {/* NASA-style search and filter controls */}
+            <div className="navigation-controls">
+              <div className="search-section">
+                <label htmlFor="object-search">🔍 Search Objects:</label>
+                <input
+                  id="object-search"
+                  type="text"
+                  placeholder="Search by name, type, or description..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
+              </div>
+              
+              <div className="filter-section">
+                <label htmlFor="object-filter">🎯 Filter by Type:</label>
+                <select
+                  id="object-filter"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="">All Objects</option>
+                  <option value="star">Stars</option>
+                  <option value="planet">Planets</option>
+                  <option value="moon">Moons</option>
+                  <option value="asteroid">Asteroids</option>
+                  <option value="exoplanet">Exoplanets</option>
+                  <option value="galaxy">Galaxies</option>
+                  <option value="nebula">Nebulae</option>
+                  <option value="dark-matter">Dark Matter</option>
+                  <option value="dark-energy">Dark Energy</option>
+                  <option value="quantum">Quantum Fields</option>
+                  <option value="spacetime">Spacetime</option>
+                </select>
+              </div>
+              
+              <div className="zoom-controls">
+                <label>🔍 Zoom Level: {zoomLevel.toFixed(1)}x</label>
+                <div className="zoom-buttons">
+                  <button 
+                    onClick={() => {
+                      const svg = d3.select(svgRef.current)
+                      svg.transition().duration(300).call(
+                        d3.zoom<SVGSVGElement, unknown>().scaleBy as any, 1.5
+                      )
+                    }}
+                    className="zoom-btn"
+                  >
+                    🔍+
+                  </button>
+                  <button 
+                    onClick={() => {
+                      const svg = d3.select(svgRef.current)
+                      svg.transition().duration(300).call(
+                        d3.zoom<SVGSVGElement, unknown>().scaleBy as any, 0.67
+                      )
+                    }}
+                    className="zoom-btn"
+                  >
+                    🔍−
+                  </button>
+                  <button 
+                    onClick={() => {
+                      const svg = d3.select(svgRef.current)
+                      svg.transition().duration(500).call(
+                        d3.zoom<SVGSVGElement, unknown>().transform as any, 
+                        d3.zoomIdentity
+                      )
+                    }}
+                    className="zoom-btn reset"
+                  >
+                    🎯 Reset
+                  </button>
+                </div>
+              </div>
+              
+              <div className="stats-display">
+                <div className="stat-item">
+                  <span className="stat-label">Visible Objects:</span>
+                  <span className="stat-value">{filteredNodes.length}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Total Objects:</span>
+                  <span className="stat-value">{nodes.length}</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Enhanced legend with interactive elements */}
+            <div className="legend">
+              <h4>Object Types</h4>
+              <div className="legend-grid">
+                <div className="legend-item" onClick={() => setFilterType(filterType === 'star' ? '' : 'star')}>
+                  <div className="legend-color star"></div>
+                  <span>Stars</span>
+                </div>
+                <div className="legend-item" onClick={() => setFilterType(filterType === 'planet' ? '' : 'planet')}>
+                  <div className="legend-color planet"></div>
+                  <span>Planets</span>
+                </div>
+                <div className="legend-item" onClick={() => setFilterType(filterType === 'moon' ? '' : 'moon')}>
+                  <div className="legend-color moon"></div>
+                  <span>Moons</span>
+                </div>
+                <div className="legend-item" onClick={() => setFilterType(filterType === 'asteroid' ? '' : 'asteroid')}>
+                  <div className="legend-color asteroid"></div>
+                  <span>Asteroids</span>
+                </div>
+                <div className="legend-item" onClick={() => setFilterType(filterType === 'exoplanet' ? '' : 'exoplanet')}>
+                  <div className="legend-color exoplanet"></div>
+                  <span>Exoplanets</span>
+                </div>
+                <div className="legend-item" onClick={() => setFilterType(filterType === 'galaxy' ? '' : 'galaxy')}>
+                  <div className="legend-color galaxy"></div>
+                  <span>Galaxies</span>
+                </div>
+                <div className="legend-item" onClick={() => setFilterType(filterType === 'dark-matter' ? '' : 'dark-matter')}>
+                  <div className="legend-color quantum"></div>
+                  <span>Dark Matter</span>
+                </div>
+                <div className="legend-item">
+                  <div className="legend-color hazardous"></div>
+                  <span>Hazardous Objects</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Quick navigation shortcuts */}
+            <div className="quick-nav">
+              <h4>Quick Navigation</h4>
+              <div className="nav-buttons">
+                <button onClick={() => setSearchTerm('sun')} className="nav-btn">☀️ Solar System</button>
+                <button onClick={() => setSearchTerm('proxima')} className="nav-btn">🌟 Nearby Stars</button>
+                <button onClick={() => setSearchTerm('dark')} className="nav-btn">🌌 Dark Universe</button>
+                <button onClick={() => setSearchTerm('quantum')} className="nav-btn">⚛️ Quantum Fields</button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
+      
       <svg ref={svgRef} className="universe-graph-svg"></svg>
       {selectedNode && (
         <div className="node-details-panel">

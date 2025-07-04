@@ -68,6 +68,7 @@ body {
   /* Ensure all content sections are properly sized */
   .neo-tracker,
   .cosmos-explorer,
+  .earth-weather,
   .author-section,
   .universe-explorer {
     height: auto !important;
@@ -96,6 +97,27 @@ body {
     display: block;
     height: 60px;
     width: 100%;
+  }
+  
+  /* Weather dashboard mobile fixes */
+  .weather-dashboard {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  
+  .weather-data-panel {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  
+  .severe-weather-alerts,
+  .tropical-weather-outlook {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
   
   /* Touch-friendly button sizes */

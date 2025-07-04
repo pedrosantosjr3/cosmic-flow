@@ -1036,9 +1036,9 @@ body {
 /* Earth Weather */
 .earth-weather {
   padding: 40px;
-  min-height: calc(100vh - 80px);
+  min-height: auto;
   background: transparent !important;
-  overflow-y: auto;
+  overflow-y: visible;
 }
 
 /* Solar System Modal */

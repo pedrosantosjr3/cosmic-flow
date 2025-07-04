@@ -74,13 +74,20 @@
   top: 20px;
   left: 20px;
   z-index: 10;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  border-radius: 15px;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  border-radius: 18px;
   padding: 20px;
   color: white;
-  max-width: 300px;
+  max-width: 350px;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.graph-controls.collapsed {
+  max-width: 200px;
+  padding: 15px;
 }
 
 .graph-controls h3 {
@@ -516,4 +523,378 @@
     flex-direction: column;
     padding: 10px;
   }
+}
+
+/* Enhanced NASA-style navigation controls */
+.controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.toggle-controls-btn {
+  background: rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  color: #667eea;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-controls-btn:hover {
+  background: rgba(102, 126, 234, 0.3);
+  transform: scale(1.1);
+}
+
+.navigation-controls {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-section,
+.filter-section,
+.zoom-controls {
+  margin-bottom: 15px;
+}
+
+.search-section label,
+.filter-section label,
+.zoom-controls label {
+  display: block;
+  font-size: 0.9rem;
+  color: #667eea;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.search-input,
+.filter-select {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus,
+.filter-select:focus {
+  outline: none;
+  border-color: rgba(102, 126, 234, 0.6);
+  box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.zoom-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.zoom-btn {
+  background: rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: #667eea;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.zoom-btn:hover {
+  background: rgba(102, 126, 234, 0.3);
+  transform: translateY(-1px);
+}
+
+.zoom-btn.reset {
+  background: rgba(255, 165, 2, 0.2);
+  border-color: rgba(255, 165, 2, 0.4);
+  color: #FFA502;
+}
+
+.zoom-btn.reset:hover {
+  background: rgba(255, 165, 2, 0.3);
+}
+
+.stats-display {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.stat-item:last-child {
+  margin-bottom: 0;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #667eea;
+  font-size: 0.9rem;
+}
+
+.legend h4 {
+  color: #667eea;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+}
+
+.legend-item:hover {
+  background: rgba(102, 126, 234, 0.1);
+  border-color: rgba(102, 126, 234, 0.3);
+  transform: translateY(-1px);
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.legend-color.star {
+  background: radial-gradient(circle, #FFD700, #FF8C00);
+  box-shadow: 0 0 6px #FFD700;
+}
+
+.legend-color.planet {
+  background: radial-gradient(circle, #4A90E2, #2E5B8C);
+}
+
+.legend-color.moon {
+  background: radial-gradient(circle, #F5F5F5, #C0C0C0);
+}
+
+.legend-color.asteroid {
+  background: radial-gradient(circle, #A0A0A0, #696969);
+}
+
+.legend-color.exoplanet {
+  background: radial-gradient(circle, #9370DB, #483D8B);
+}
+
+.legend-color.galaxy {
+  background: radial-gradient(circle, #FF69B4, #DC143C);
+}
+
+.legend-color.quantum {
+  background: radial-gradient(circle, #00CED1, #008B8B);
+}
+
+.legend-color.hazardous {
+  background: radial-gradient(circle, #ff4757, #ff3838);
+  box-shadow: 0 0 8px #ff4757;
+}
+
+.legend-item span {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.quick-nav {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quick-nav h4 {
+  color: #667eea;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.nav-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.nav-btn {
+  background: rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #667eea;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.nav-btn:hover {
+  background: rgba(102, 126, 234, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+/* Enhanced mobile responsiveness for new controls */
+@media (max-width: 768px) {
+  .graph-controls {
+    max-width: calc(100vw - 40px);
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .legend-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .nav-buttons {
+    grid-template-columns: 1fr;
+  }
+  
+  .zoom-buttons {
+    flex-direction: column;
+  }
+}
+
+/* Advanced 3D celestial object animations */
+@keyframes stellar-pulse {
+  0% { 
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% { 
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: scale(1);
+    opacity: 0.6;
+  }
+}
+
+@keyframes ring-rotation-1 {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.02); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes ring-rotation-2 {
+  0% { transform: rotate(15deg) scale(1); }
+  50% { transform: rotate(195deg) scale(0.98); }
+  100% { transform: rotate(375deg) scale(1); }
+}
+
+@keyframes ring-rotation-3 {
+  0% { transform: rotate(30deg) scale(1); }
+  50% { transform: rotate(210deg) scale(1.01); }
+  100% { transform: rotate(390deg) scale(1); }
+}
+
+@keyframes quantum-pulse-1 {
+  0% { 
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% { 
+    transform: scale(1.05);
+    opacity: 0.5;
+  }
+  100% { 
+    transform: scale(1);
+    opacity: 0.3;
+  }
+}
+
+@keyframes quantum-pulse-2 {
+  0% { 
+    transform: scale(1);
+    opacity: 0.15;
+  }
+  50% { 
+    transform: scale(1.08);
+    opacity: 0.25;
+  }
+  100% { 
+    transform: scale(1);
+    opacity: 0.15;
+  }
+}
+
+@keyframes quantum-pulse-3 {
+  0% { 
+    transform: scale(1);
+    opacity: 0.1;
+  }
+  50% { 
+    transform: scale(1.1);
+    opacity: 0.2;
+  }
+  100% { 
+    transform: scale(1);
+    opacity: 0.1;
+  }
+}
+
+/* Enhanced celestial body effects */
+.universe-graph-svg .node circle {
+  transition: all 0.3s ease;
+}
+
+.universe-graph-svg .node:hover circle {
+  filter: brightness(1.2) saturate(1.1);
+}
+
+.universe-graph-svg .node.star circle {
+  animation: stellar-pulse 3s ease-in-out infinite;
+}
+
+.universe-graph-svg .node.quantum circle {
+  animation: quantum-pulse-1 4s ease-in-out infinite;
 }
