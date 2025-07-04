@@ -3779,3 +3779,131 @@
     font-size: 0.8rem;
   }
 }
+
+/* Date Validation Styles */
+.approach-date {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.date-status {
+  font-size: 0.75rem;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.date-status.current {
+  color: #00ff00;
+  font-weight: 600;
+}
+
+.date-status.recent {
+  color: #FFA502;
+}
+
+.date-status.outdated {
+  color: #ff4757;
+  opacity: 0.6;
+}
+
+/* Real-time Data Indicators */
+.online-status .status-dot.online {
+  animation: status-pulse 2s ease-in-out infinite;
+}
+
+@keyframes status-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px #00ff00;
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 15px #00ff00, 0 0 20px rgba(0, 255, 0, 0.3);
+    opacity: 0.8;
+  }
+}
+
+/* Weather Alert Styles */
+.weather-alert-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 71, 87, 0.9);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  animation: alert-badge-pulse 3s ease-in-out infinite;
+}
+
+@keyframes alert-badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 71, 87, 0.8);
+  }
+}
+
+/* Data Update Timestamps */
+.update-timestamp {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+  margin-top: 5px;
+}
+
+.update-timestamp.live {
+  color: #00ff00;
+  font-weight: 500;
+}
+
+/* Loading States */
+.data-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #667eea;
+  font-size: 0.9rem;
+  padding: 10px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 8px;
+  animation: loading-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes loading-pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Cache Status Indicator */
+.cache-status {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.cache-status.cached {
+  border: 1px solid rgba(255, 165, 2, 0.4);
+  color: #FFA502;
+}
+
+.cache-status.live {
+  border: 1px solid rgba(0, 255, 0, 0.4);
+  color: #00ff00;
+}
