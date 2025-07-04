@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import * as d3 from 'd3'
 import './UniverseGraph.css'
+import './UniverseGraph-mobile.css'
 
 interface UniverseNode {
   id: string
@@ -55,15 +56,53 @@ interface UniverseGraphProps {
 
 const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCategory }) => {
   const svgRef = useRef<SVGSVGElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [nodes, setNodes] = useState<UniverseNode[]>([])
   const [links, setLinks] = useState<UniverseLink[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedNode, setSelectedNode] = useState<UniverseNode | null>(null)
+  const [dimensions, setDimensions] = useState({ width: 1200, height: 800 })
 
   // Initialize universe data
   useEffect(() => {
     loadUniverseData()
   }, [])
+
+  // Handle window resize for mobile responsiveness
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect()
+        const isMobile = window.innerWidth <= 768
+        setDimensions({
+          width: Math.max(rect.width - 40, isMobile ? window.innerWidth - 20 : 800),
+          height: Math.max(rect.height - 100, isMobile ? window.innerHeight * 0.6 : 600)
+        })
+      }
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  // Handle click outside to close properties panel
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (selectedNode && containerRef.current) {
+        const target = event.target as Element
+        const isInsideGraph = containerRef.current.contains(target)
+        const isInsidePanel = target.closest('.node-details-panel')
+        
+        if (!isInsideGraph && !isInsidePanel) {
+          setSelectedNode(null)
+        }
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [selectedNode])
 
   const loadUniverseData = async () => {
     setLoading(true)
@@ -700,10 +739,12 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
     const svg = d3.select(svgRef.current)
     svg.selectAll('*').remove()
 
-    const width = 1200
-    const height = 800
+    const { width, height } = dimensions
 
     svg.attr('width', width).attr('height', height)
+      .attr('viewBox', `0 0 ${width} ${height}`)
+      .style('max-width', '100%')
+      .style('height', 'auto')
 
     // Create simulation
     const simulation = d3.forceSimulation(filteredNodes as any)
@@ -946,6 +987,7 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
 
     // Add click handlers
     node.on('click', (event, d: any) => {
+      event.stopPropagation()
       setSelectedNode(d)
       onNodeClick(d)
       
@@ -964,6 +1006,16 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       // Highlight selected node
       node.selectAll('circle').attr('stroke-width', 1)
       d3.select(event.currentTarget).select('circle').attr('stroke-width', 4)
+    })
+
+    // Add click handler to SVG background to close properties panel
+    svg.on('click', () => {
+      setSelectedNode(null)
+      // Reset all node highlights
+      node.selectAll('circle').attr('stroke-width', (d: any) => {
+        if (d.data?.isPotentiallyHazardous) return 3
+        return d.type === 'star' ? 2 : 1
+      })
     })
 
     // Add hover effects
@@ -1014,7 +1066,7 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       node.attr('transform', (d: any) => `translate(${d.x},${d.y})`)
     })
 
-  }, [filteredNodes, links, loading, selectedNode, onNodeClick])
+  }, [filteredNodes, links, loading, selectedNode, onNodeClick, dimensions])
 
   if (loading) {
     return (
@@ -1026,7 +1078,7 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
   }
 
   return (
-    <div className="universe-graph-container">
+    <div className="universe-graph-container" ref={containerRef}>
       <div className="graph-controls">
         <h3>Universe Dependency Graph</h3>
         <p>Interactive visualization of cosmic objects and their relationships</p>
@@ -1056,6 +1108,13 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       <svg ref={svgRef} className="universe-graph-svg"></svg>
       {selectedNode && (
         <div className="node-details-panel">
+          <button 
+            className="close-panel-btn"
+            onClick={() => setSelectedNode(null)}
+            aria-label="Close properties panel"
+          >
+            ✕
+          </button>
           <div className="node-header">
             <h4>{selectedNode.name}</h4>
             <span className={`type-badge ${selectedNode.type}`}>{selectedNode.type.toUpperCase()}</span>

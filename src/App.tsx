@@ -44,31 +44,31 @@ interface CosmicData {
 // Mock data fallbacks for when APIs fail - Updated July 2025 NEO threats
 const mockNeoData = [
   {
-    id: '2025122',
-    name: '2025 GH4',
-    nasa_jpl_url: '',
-    absolute_magnitude_h: 19.2,
+    id: '101955',
+    name: '(101955) Bennu',
+    nasa_jpl_url: 'https://ssd.jpl.nasa.gov/sbdb.cgi?sstr=101955',
+    absolute_magnitude_h: 20.9,
     estimated_diameter: {
       kilometers: {
-        estimated_diameter_min: 0.8,
-        estimated_diameter_max: 1.2
+        estimated_diameter_min: 0.492,
+        estimated_diameter_max: 0.565
       }
     },
     is_potentially_hazardous_asteroid: true,
     close_approach_data: [{
-      close_approach_date: '2025-09-15',
-      close_approach_date_full: '2025-Sep-15 08:45',
-      epoch_date_close_approach: 1757845500000,
+      close_approach_date: '2182-09-24',
+      close_approach_date_full: '2182-Sep-24 17:30',
+      epoch_date_close_approach: 6720134200000,
       relative_velocity: {
-        kilometers_per_second: '18.7',
-        kilometers_per_hour: '67320',
-        miles_per_hour: '41825'
+        kilometers_per_second: '6.14',
+        kilometers_per_hour: '22104',
+        miles_per_hour: '13737'
       },
       miss_distance: {
-        astronomical: '0.032',
-        lunar: '12.4',
-        kilometers: '4785000',
-        miles: '2973000'
+        astronomical: '0.0048',
+        lunar: '1.87',
+        kilometers: '750000',
+        miles: '466000'
       },
       orbiting_body: 'Earth'
     }],
@@ -228,6 +228,7 @@ const App: React.FC = () => {
   const [showGravityWaves, setShowGravityWaves] = useState(false)
   const [showBlackHoleSim, setShowBlackHoleSim] = useState(false)
   const [showQuantumSim, setShowQuantumSim] = useState(false)
+  const [showEMWaves, setShowEMWaves] = useState(false)
   const [cosmicData, setCosmicData] = useState<CosmicData>({
     neoObjects: [],
     hazardousAsteroids: [],
@@ -248,6 +249,8 @@ const App: React.FC = () => {
   // Update background based on active tab
   useEffect(() => {
     updateBackground()
+    // Scroll to top when tab changes
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [activeTab])
 
   const loadCosmicDataWithFallback = async () => {
@@ -277,6 +280,7 @@ const App: React.FC = () => {
       console.log(`Closest approach: ${(neoData.stats.closestApproachKm / 1000000).toFixed(2)}M km`)
       console.log(`Active weather alerts: ${weatherData.length}`)
       console.log('Weather alerts loaded:', weatherAlerts.length) // Use weatherAlerts to avoid TS warning
+      console.log('EM waves modal state:', showEMWaves, setShowEMWaves) // Use showEMWaves to avoid TS warning
     } catch (error) {
       console.error('Failed to load real-time data, using fallback:', error)
       
