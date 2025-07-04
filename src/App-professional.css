@@ -144,19 +144,28 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 15px 22px;
+  padding: 15px 18px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
   text-decoration: none;
-  overflow: visible;
+  overflow: hidden;
   min-height: 50px;
   box-sizing: border-box;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tab-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
 }
 
 .nav-tab:hover {
@@ -1616,24 +1625,40 @@ body {
 }
 
 /* Responsive Design */
+@media (max-width: 1400px) {
+  .nav-tab {
+    padding: 12px 14px;
+    font-size: 0.85rem;
+  }
+}
+
 @media (max-width: 1200px) {
   .professional-nav {
-    padding: 12px 20px;
+    padding: 12px 15px;
     min-height: 85px;
   }
   
   .nav-brand {
-    margin-right: 25px;
+    margin-right: 20px;
   }
   
   .nav-tabs {
-    gap: 4px;
+    gap: 3px;
   }
   
   .nav-tab {
-    padding: 12px 16px;
+    padding: 12px 12px;
     font-size: 0.8rem;
     min-height: 45px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .tab-label {
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 

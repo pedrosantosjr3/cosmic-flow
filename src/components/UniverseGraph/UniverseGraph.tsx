@@ -803,10 +803,19 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       const galacticScale = 0.1    // pixels per light-year for distant objects
       
       filteredNodes.forEach((node: any) => {
+        // Only position if node doesn't already have stable positions
+        if (node.x !== undefined && node.y !== undefined && node.fx !== undefined && node.fy !== undefined) {
+          return // Skip if already positioned
+        }
+        
+        // Use deterministic positioning based on node ID to avoid random movement
+        const nodeHash = node.id.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0)
+        const deterministicAngle = (nodeHash * 0.1) % (2 * Math.PI)
+        
         // Position solar system objects based on actual distances
         if (['sun', 'mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'].includes(node.id)) {
           const distance = node.distance || 0
-          const angle = (node.id === 'sun' ? 0 : Math.random() * 2 * Math.PI)
+          const angle = (node.id === 'sun' ? 0 : deterministicAngle)
           
           if (node.id === 'sun') {
             node.x = centerX
@@ -819,37 +828,41 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
         // Position moons around their parent planets
         else if (node.type === 'moon' && node.data?.parent) {
           const parent = filteredNodes.find((n: any) => n.id === node.data.parent)
-          if (parent) {
-            const moonAngle = Math.random() * 2 * Math.PI
-            const moonDistance = 20 + Math.random() * 30 // 20-50 pixels from parent
-            node.x = (parent.x || centerX) + Math.cos(moonAngle) * moonDistance
-            node.y = (parent.y || centerY) + Math.sin(moonAngle) * moonDistance
+          if (parent && parent.x !== undefined && parent.y !== undefined) {
+            const moonAngle = deterministicAngle
+            const moonDistance = 20 + (nodeHash % 30) // 20-50 pixels from parent
+            node.x = parent.x + Math.cos(moonAngle) * moonDistance
+            node.y = parent.y + Math.sin(moonAngle) * moonDistance
+          } else {
+            // Fallback if parent not positioned yet
+            node.x = centerX + Math.cos(deterministicAngle) * 300
+            node.y = centerY + Math.sin(deterministicAngle) * 300
           }
         }
         // Position nearby stars based on their actual distances
         else if (node.type === 'star' && node.distance) {
-          const starAngle = Math.random() * 2 * Math.PI
+          const starAngle = deterministicAngle
           const starDistance = node.distance * localStarScale
           node.x = centerX + Math.cos(starAngle) * starDistance
           node.y = centerY + Math.sin(starAngle) * starDistance
         }
         // Position quantum/cosmic phenomena in background
         else if (['dark-matter', 'dark-energy', 'quantum', 'spacetime'].includes(node.type)) {
-          const bgAngle = Math.random() * 2 * Math.PI
-          const bgDistance = 400 + Math.random() * 200
+          const bgAngle = deterministicAngle
+          const bgDistance = 400 + (nodeHash % 200)
           node.x = centerX + Math.cos(bgAngle) * bgDistance
           node.y = centerY + Math.sin(bgAngle) * bgDistance
         }
         // Position galaxies and nebulae at cosmic distances
         else if (['galaxy', 'nebula'].includes(node.type)) {
-          const cosmicAngle = Math.random() * 2 * Math.PI
-          const cosmicDistance = 600 + Math.random() * 400
+          const cosmicAngle = deterministicAngle
+          const cosmicDistance = 600 + (nodeHash % 400)
           node.x = centerX + Math.cos(cosmicAngle) * cosmicDistance
           node.y = centerY + Math.sin(cosmicAngle) * cosmicDistance
         }
         // Position exoplanets based on their star distances
         else if (node.type === 'exoplanet' && node.distance) {
-          const exoAngle = Math.random() * 2 * Math.PI
+          const exoAngle = deterministicAngle
           const exoDistance = Math.min(node.distance * galacticScale, 300) + 250
           node.x = centerX + Math.cos(exoAngle) * exoDistance
           node.y = centerY + Math.sin(exoAngle) * exoDistance
@@ -858,22 +871,22 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
         else if (node.type === 'asteroid') {
           if (node.data?.isPotentiallyHazardous) {
             // Near-Earth asteroids
-            const neoAngle = Math.random() * 2 * Math.PI
-            const neoDistance = 150 + Math.random() * 100
+            const neoAngle = deterministicAngle
+            const neoDistance = 150 + (nodeHash % 100)
             node.x = centerX + Math.cos(neoAngle) * neoDistance
             node.y = centerY + Math.sin(neoAngle) * neoDistance
           } else {
             // Asteroid belt (around 2.7 AU average)
-            const beltAngle = Math.random() * 2 * Math.PI
-            const beltDistance = 2.7 * solarSystemScale + (Math.random() - 0.5) * 100
+            const beltAngle = deterministicAngle
+            const beltDistance = 2.7 * solarSystemScale + ((nodeHash % 100) - 50)
             node.x = centerX + Math.cos(beltAngle) * beltDistance
             node.y = centerY + Math.sin(beltAngle) * beltDistance
           }
         }
         // Default positioning for any unhandled objects
         else {
-          const defaultAngle = Math.random() * 2 * Math.PI
-          const defaultDistance = 300 + Math.random() * 200
+          const defaultAngle = deterministicAngle
+          const defaultDistance = 300 + (nodeHash % 200)
           node.x = centerX + Math.cos(defaultAngle) * defaultDistance
           node.y = centerY + Math.sin(defaultAngle) * defaultDistance
         }
