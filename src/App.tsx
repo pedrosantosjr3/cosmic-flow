@@ -1256,8 +1256,12 @@ const App: React.FC = () => {
             <div className="real-earth-satellite">
               <img 
                 src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/1808x1808.jpg" 
-                alt="Real-time Earth from GOES-16" 
+                alt="Real-time Earth from GOES-19" 
                 className="earth-satellite-image"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/1808x1808.jpg';
+                }}
               />
               <div className="satellite-overlay">
                 <div className="live-data-badge">🛰️ GOES-19 East Live</div>
@@ -1314,7 +1318,7 @@ const App: React.FC = () => {
                 <span className="info">1</span>
               </div>
               <div className="weather-stat">
-                <label>Formation Chance:</label>
+                <label>Tropical Cyclone Formation (48hrs):</label>
                 <span className="warning">70%</span>
               </div>
               <div className="weather-stat">
@@ -1333,8 +1337,15 @@ const App: React.FC = () => {
             <div className="satellite-grid">
               <div className="satellite-feed">
                 <div className="feed-header">GOES-19 East - Interactive View</div>
-                <div className="satellite-image interactive-satellite" onClick={() => window.open('https://www.star.nesdis.noaa.gov/GOES/fulldisk_band.php?sat=G16', '_blank')}>
-                  <img src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/CONUS/GEOCOLOR/1250x750.jpg" alt="GOES-16 Earth" />
+                <div className="satellite-image interactive-satellite" onClick={() => window.open('https://www.star.nesdis.noaa.gov/GOES/fulldisk_band.php?sat=G19', '_blank')}>
+                  <img 
+                    src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/CONUS/GEOCOLOR/1250x750.jpg" 
+                    alt="GOES-19 East Coast" 
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/1808x1808.jpg';
+                    }}
+                  />
                   <div className="live-indicator">🔴 LIVE</div>
                   <div className="interaction-overlay">
                     <span>🌍 Click to view interactive Earth</span>
@@ -1343,8 +1354,15 @@ const App: React.FC = () => {
               </div>
               <div className="satellite-feed">
                 <div className="feed-header">GOES-18 West - Interactive View</div>
-                <div className="satellite-image interactive-satellite" onClick={() => window.open('https://www.star.nesdis.noaa.gov/GOES/fulldisk_band.php?sat=G17', '_blank')}>
-                  <img src="https://cdn.star.nesdis.noaa.gov/GOES17/ABI/FD/GEOCOLOR/1250x1250.jpg" alt="GOES-17 Pacific" />
+                <div className="satellite-image interactive-satellite" onClick={() => window.open('https://www.star.nesdis.noaa.gov/GOES/fulldisk_band.php?sat=G18', '_blank')}>
+                  <img 
+                    src="https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/1808x1808.jpg" 
+                    alt="GOES-18 West Coast" 
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://cdn.star.nesdis.noaa.gov/GOES17/ABI/FD/GEOCOLOR/1250x1250.jpg';
+                    }}
+                  />
                   <div className="live-indicator">🔴 LIVE</div>
                   <div className="interaction-overlay">
                     <span>🌍 Click to view interactive Earth</span>
@@ -1431,13 +1449,16 @@ const App: React.FC = () => {
                     <p className="system-location">25.4°N, 45.2°W | Central Atlantic</p>
                     <div className="development-chances">
                       <div className="chance-item">
-                        <span className="timeframe">48 hours:</span>
+                        <span className="timeframe">Tropical Depression Formation - 48 hours:</span>
                         <span className="percentage high">70%</span>
                       </div>
                       <div className="chance-item">
-                        <span className="timeframe">7 days:</span>
+                        <span className="timeframe">Tropical Storm Development - 7 days:</span>
                         <span className="percentage high">80%</span>
                       </div>
+                    </div>
+                    <div className="formation-explanation">
+                      <p><strong>Formation Criteria:</strong> Tropical depression requires sustained winds of 39+ mph with organized circulation. Current system shows increasing convection and improving low-level circulation.</p>
                     </div>
                   </div>
                 </div>

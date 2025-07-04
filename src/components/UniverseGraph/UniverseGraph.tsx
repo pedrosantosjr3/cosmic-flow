@@ -757,12 +757,17 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       .style('max-width', '100%')
       .style('height', 'auto')
 
-    // Create simulation
+    // Create stable simulation with gentler forces
     const simulation = d3.forceSimulation(filteredNodes as any)
-      .force('link', d3.forceLink(links).id((d: any) => d.id).strength(0.3))
-      .force('charge', d3.forceManyBody().strength(-300))
+      .force('link', d3.forceLink(links.filter(l => 
+        filteredNodes.some(n => n.id === l.source) && 
+        filteredNodes.some(n => n.id === l.target)
+      )).id((d: any) => d.id).strength(0.1))
+      .force('charge', d3.forceManyBody().strength(-100))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius((d: any) => d.size + 5))
+      .force('collision', d3.forceCollide().radius((d: any) => d.size + 10).strength(0.7))
+      .alpha(0.3)
+      .alphaDecay(0.02)
 
     // Create zoom behavior with enhanced controls
     const zoom = d3.zoom<SVGSVGElement, unknown>()
@@ -1104,28 +1109,50 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       })
     })
 
-    // Add hover effects
-    node.on('mouseover', function(_, d: any) {
-      d3.select(this).select('circle')
+    // Add stable hover effects that don't affect simulation
+    node.on('mouseover', function() {
+      const nodeElement = d3.select(this)
+      
+      // Only change visual properties, not size that affects forces
+      nodeElement.selectAll('circle')
         .transition()
-        .duration(200)
-        .attr('r', d.size * 1.2)
-        .attr('stroke-width', 3)
+        .duration(150)
+        .attr('stroke-width', 4)
+        .style('filter', 'brightness(1.3) saturate(1.2)')
+        .style('transform', 'scale(1.1)')
+        
+      // Show enhanced label
+      nodeElement.select('text')
+        .transition()
+        .duration(150)
+        .attr('font-size', '14px')
+        .attr('font-weight', 'bold')
+        .style('text-shadow', '2px 2px 4px rgba(0,0,0,0.9)')
     })
     .on('mouseout', function(_, d: any) {
       if (d !== selectedNode) {
-        d3.select(this).select('circle')
+        const nodeElement = d3.select(this)
+        
+        nodeElement.selectAll('circle')
           .transition()
-          .duration(200)
-          .attr('r', d.size)
-          .attr('stroke-width', d.data?.isPotentiallyHazardous ? 3 : 1)
+          .duration(150)
+          .attr('stroke-width', d.data?.isPotentiallyHazardous ? 3 : (d.type === 'star' ? 2 : 1))
+          .style('filter', 'none')
+          .style('transform', 'scale(1)')
+          
+        nodeElement.select('text')
+          .transition()
+          .duration(150)
+          .attr('font-size', '12px')
+          .attr('font-weight', 'bold')
+          .style('text-shadow', '1px 1px 2px rgba(0,0,0,0.8)')
       }
     })
 
-    // Add drag behavior
+    // Add stable drag behavior
     const drag = d3.drag<SVGGElement, any>()
       .on('start', (event, d) => {
-        if (!event.active) simulation.alphaTarget(0.3).restart()
+        if (!event.active) simulation.alphaTarget(0.1).restart()
         d.fx = d.x
         d.fy = d.y
       })
@@ -1135,14 +1162,22 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       })
       .on('end', (event, d) => {
         if (!event.active) simulation.alphaTarget(0)
-        d.fx = null
-        d.fy = null
+        // Keep nodes in position after dragging for stability
+        d.fx = event.x
+        d.fy = event.y
       })
 
     node.call(drag)
 
-    // Update positions on simulation tick
+    // Update positions on simulation tick with boundary constraints
     simulation.on('tick', () => {
+      // Constrain nodes to stay within the visible area
+      filteredNodes.forEach((d: any) => {
+        const margin = d.size + 20
+        d.x = Math.max(margin, Math.min(width - margin, d.x))
+        d.y = Math.max(margin, Math.min(height - margin, d.y))
+      })
+
       link
         .attr('x1', (d: any) => d.source.x)
         .attr('y1', (d: any) => d.source.y)
