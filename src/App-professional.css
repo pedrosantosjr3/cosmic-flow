@@ -245,7 +245,6 @@ body {
   padding: 0;
   background: transparent;
   overflow-y: auto;
-  max-height: calc(100vh - 90px);
   box-sizing: border-box;
 }
 

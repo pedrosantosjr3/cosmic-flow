@@ -469,8 +469,8 @@ const App: React.FC = () => {
   const renderUniverseExplorer = () => (
     <div className="universe-explorer">
       <div className="explorer-header">
-        <h2>🌌 Universe Dependency Graph</h2>
-        <p>Interactive visualization of cosmic objects and their gravitational relationships</p>
+        <h2>🌌 Universe Explorer</h2>
+        <p>Interactive visualization of cosmic objects and their relationships</p>
         <div className="online-status">
           <div className="status-indicator">
             <div className="status-dot online"></div>
@@ -1167,6 +1167,12 @@ const App: React.FC = () => {
       <div className="cosmos-header">
         <h2>🔭 Cosmic Discovery Center</h2>
         <p>Latest astronomical discoveries and space exploration updates</p>
+        <div className="online-status">
+          <div className="status-indicator">
+            <div className="status-dot online"></div>
+            <span>{cosmicData.loading ? 'Updating...' : 'Live Data'}</span>
+          </div>
+        </div>
       </div>
       
       <div className="cosmos-content">
