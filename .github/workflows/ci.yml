@@ -1,0 +1,293 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run type checking
+      run: npm run type-check
+    
+    - name: Run linting
+      run: npm run lint
+    
+    - name: Run unit tests
+      run: npm run test:coverage
+      env:
+        REACT_APP_NASA_API_KEY: ${{ secrets.NASA_API_KEY || 'DEMO_KEY' }}
+        REACT_APP_OPENAI_API_KEY: 'test-key'
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+    
+    - name: Build application
+      run: npm run build
+      env:
+        REACT_APP_NASA_API_KEY: ${{ secrets.NASA_API_KEY || 'DEMO_KEY' }}
+        REACT_APP_OPENAI_API_KEY: 'test-key'
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-files-${{ matrix.node-version }}
+        path: dist/
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+    
+    - name: Run E2E tests
+      run: npm run test:e2e
+      env:
+        REACT_APP_NASA_API_KEY: 'DEMO_KEY'
+        REACT_APP_OPENAI_API_KEY: 'test-key'
+    
+    - name: Upload E2E test results
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: playwright-report
+        path: playwright-report/
+    
+    - name: Upload test videos
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: test-videos
+        path: test-results/
+
+  performance-tests:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps chromium
+    
+    - name: Run performance tests
+      run: npx playwright test tests/performance/ --project=chromium
+      env:
+        REACT_APP_NASA_API_KEY: 'DEMO_KEY'
+        REACT_APP_OPENAI_API_KEY: 'test-key'
+    
+    - name: Upload performance results
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-report
+        path: playwright-report/
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run security audit
+      run: npm audit --audit-level high
+    
+    - name: Run Snyk security scan
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
+      continue-on-error: true
+
+  lighthouse-ci:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build application
+      run: npm run build
+      env:
+        REACT_APP_NASA_API_KEY: 'DEMO_KEY'
+        REACT_APP_OPENAI_API_KEY: 'test-key'
+    
+    - name: Serve application
+      run: npx serve -s dist -p 3000 &
+      
+    - name: Wait for server
+      run: npx wait-on http://localhost:3000
+    
+    - name: Install Lighthouse CI
+      run: npm install -g @lhci/cli
+    
+    - name: Run Lighthouse CI
+      run: lhci autorun
+      env:
+        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  deploy-preview:
+    runs-on: ubuntu-latest
+    needs: [test, e2e-tests]
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build application
+      run: npm run build
+      env:
+        REACT_APP_NASA_API_KEY: 'DEMO_KEY'
+        REACT_APP_OPENAI_API_KEY: 'test-key'
+    
+    - name: Deploy to Netlify
+      uses: nwtgck/actions-netlify@v2.0
+      with:
+        publish-dir: './dist'
+        production-branch: main
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "Deploy from GitHub Actions"
+        enable-pull-request-comment: true
+        enable-commit-comment: true
+        overwrites-pull-request-comment: true
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+  bundle-analysis:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build and analyze bundle
+      run: |
+        npm run build
+        npx vite-bundle-analyzer dist/
+      env:
+        REACT_APP_NASA_API_KEY: 'DEMO_KEY'
+        REACT_APP_OPENAI_API_KEY: 'test-key'
+    
+    - name: Check bundle size
+      run: |
+        BUILD_SIZE=$(du -sk dist/ | cut -f1)
+        echo "Build size: ${BUILD_SIZE}KB"
+        if [ $BUILD_SIZE -gt 5000 ]; then
+          echo "⚠️ Bundle size is too large: ${BUILD_SIZE}KB (max: 5MB)"
+          exit 1
+        else
+          echo "✅ Bundle size is acceptable: ${BUILD_SIZE}KB"
+        fi
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [test, e2e-tests, security-scan]
+    if: always()
+    
+    steps:
+    - name: Notify on success
+      if: needs.test.result == 'success' && needs.e2e-tests.result == 'success'
+      run: |
+        echo "🎉 All tests passed successfully!"
+        echo "✅ Unit tests: PASSED"
+        echo "✅ E2E tests: PASSED"
+        echo "✅ Security scan: COMPLETED"
+    
+    - name: Notify on failure
+      if: needs.test.result == 'failure' || needs.e2e-tests.result == 'failure'
+      run: |
+        echo "❌ Some tests failed!"
+        echo "Unit tests: ${{ needs.test.result }}"
+        echo "E2E tests: ${{ needs.e2e-tests.result }}"
+        exit 1

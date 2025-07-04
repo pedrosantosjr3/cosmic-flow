@@ -1,0 +1,71 @@
+/* Apply JWST backgrounds directly to each tab */
+.physics-simulation {
+  background-image: url('https://scitechdaily.com/images/Black-Hole-Event-Horizon-Artistic-Illustration.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
+
+.neo-tracker {
+  background-image: url('https://th.bing.com/th/id/R.85862066ec1ec55857aa3c7d2beafa39?rik=RSvCxi8Nq4TYTg&pid=ImgRaw&r=0') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
+
+.cosmos-explorer {
+  background-image: url('https://cdn.mos.cms.futurecdn.net/ZASZ6AJmX5mS6WYweznHtC.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
+
+.earth-weather {
+  background-image: url('https://i.pinimg.com/originals/da/55/0a/da550a2062f6dd2b11afd2897fd7b0e7.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
+
+.author-section {
+  background-image: url('https://images.pastchronicle.com/2024/07/66eb948e-img20.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
+
+/* Universe tab keeps its original stars background - no JWST image */
+
+/* Dark overlay to maintain readability - exclude universe-explorer */
+.physics-simulation::before,
+.neo-tracker::before,
+.cosmos-explorer::before,
+.earth-weather::before,
+.author-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.15) !important;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Ensure cards are very transparent */
+.stat-card,
+.impact-card,
+.apod-card,
+.mission-card,
+.discovery-item,
+.physics-card,
+.simple-physics-demo {
+  background: rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+}

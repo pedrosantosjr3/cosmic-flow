@@ -1,0 +1,46 @@
+/* Force background transparency on all main containers */
+.main-content,
+.universe-explorer,
+.physics-simulation, 
+.neo-tracker,
+.cosmos-explorer,
+.earth-weather,
+.author-section {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Force card transparency */
+.stat-card,
+.impact-card,
+.apod-card,
+.mission-card,
+.discovery-item,
+.physics-card,
+.simple-physics-demo {
+  background: rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: blur(15px) !important;
+}
+
+/* Make headers more transparent */
+.explorer-header,
+.simulation-header,
+.tracker-header,
+.cosmos-header {
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Ensure cosmic background is visible */
+.cosmic-background {
+  z-index: -10 !important;
+  opacity: 1 !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+.background-overlay {
+  background: rgba(0, 0, 0, 0.02) !important;
+  z-index: -5 !important;
+}

@@ -1,0 +1,404 @@
+.jwst-background {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+.background-layer {
+  position: absolute;
+  inset: 0;
+  transition: all 1.5s ease-in-out;
+}
+
+.background-layer.primary {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1.1);
+  filter: brightness(0.7) contrast(1.1);
+}
+
+.background-layer.primary.loaded {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.background-layer.primary.loading {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 1;
+}
+
+.overlay-gradient {
+  background: 
+    radial-gradient(ellipse at top, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
+    linear-gradient(180deg, 
+      rgba(0, 0, 0, 0.3) 0%, 
+      rgba(0, 0, 0, 0.1) 50%, 
+      rgba(0, 0, 0, 0.4) 100%
+    );
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.cosmic-dust {
+  background-image: 
+    radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.15), transparent),
+    radial-gradient(1px 1px at 40px 70px, rgba(255, 255, 255, 0.1), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(102, 126, 234, 0.1), transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(118, 75, 162, 0.1), transparent),
+    radial-gradient(2px 2px at 160px 30px, rgba(255, 255, 255, 0.08), transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: drift-dust 60s linear infinite;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.light-effects {
+  background: 
+    radial-gradient(ellipse 800px 400px at 20% 80%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse 600px 300px at 80% 20%, rgba(118, 75, 162, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse 400px 200px at 50% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+  animation: pulse-light 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.cosmic-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: var(--size, 2px);
+  height: var(--size, 2px);
+  background: radial-gradient(circle, 
+    rgba(255, 255, 255, var(--opacity, 0.4)) 0%, 
+    rgba(102, 126, 234, calc(var(--opacity, 0.4) * 0.5)) 50%, 
+    transparent 100%
+  );
+  border-radius: 50%;
+  animation: float-particle var(--duration, 20s) ease-in-out infinite var(--delay, 0s);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+}
+
+.nebula-effects {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.nebula-cloud {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.15;
+  animation: drift-nebula 120s ease-in-out infinite;
+}
+
+.cloud-1 {
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(255, 100, 150, 0.3) 0%, transparent 70%);
+  top: 10%;
+  left: -10%;
+  animation-delay: 0s;
+}
+
+.cloud-2 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(ellipse, rgba(100, 150, 255, 0.25) 0%, transparent 70%);
+  top: 40%;
+  right: -15%;
+  animation-delay: 40s;
+  animation-direction: reverse;
+}
+
+.cloud-3 {
+  width: 700px;
+  height: 350px;
+  background: radial-gradient(ellipse, rgba(150, 100, 255, 0.2) 0%, transparent 70%);
+  bottom: 20%;
+  left: 20%;
+  animation-delay: 80s;
+}
+
+.image-info {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.info-content {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  max-width: 300px;
+  text-align: right;
+  transform: translateX(100%);
+  opacity: 0;
+  animation: slideInInfo 1s ease-out 2s forwards;
+}
+
+.image-title {
+  color: #667eea;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+  letter-spacing: 1px;
+}
+
+.image-description {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0 0 15px;
+}
+
+.jwst-credit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.credit-logo {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+}
+
+.image-navigation {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+}
+
+.nav-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-dot:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: scale(1.2);
+}
+
+.nav-dot.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
+}
+
+.nav-dot.active::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  opacity: 0.3;
+  filter: blur(4px);
+  z-index: -1;
+}
+
+.content-wrapper {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+}
+
+/* Animations */
+@keyframes drift-dust {
+  from { 
+    transform: translateY(0) translateX(0); 
+  }
+  to { 
+    transform: translateY(-100px) translateX(50px); 
+  }
+}
+
+@keyframes pulse-light {
+  0%, 100% { 
+    opacity: 0.3; 
+    transform: scale(1); 
+  }
+  50% { 
+    opacity: 0.6; 
+    transform: scale(1.05); 
+  }
+}
+
+@keyframes float-particle {
+  0% { 
+    transform: translateY(0) translateX(0) scale(0);
+    opacity: 0;
+  }
+  10% { 
+    opacity: var(--opacity, 0.4);
+    transform: translateY(-20px) translateX(10px) scale(1);
+  }
+  90% { 
+    opacity: var(--opacity, 0.4);
+    transform: translateY(-200px) translateX(-30px) scale(1);
+  }
+  100% { 
+    transform: translateY(-220px) translateX(-40px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes drift-nebula {
+  0%, 100% { 
+    transform: translateX(0) translateY(0) rotate(0deg) scale(1); 
+  }
+  25% { 
+    transform: translateX(50px) translateY(-30px) rotate(90deg) scale(1.1); 
+  }
+  50% { 
+    transform: translateX(0) translateY(-60px) rotate(180deg) scale(0.9); 
+  }
+  75% { 
+    transform: translateX(-50px) translateY(-30px) rotate(270deg) scale(1.05); 
+  }
+}
+
+@keyframes slideInInfo {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .image-info {
+    bottom: 20px;
+    right: 20px;
+    left: 20px;
+  }
+
+  .info-content {
+    max-width: none;
+    text-align: center;
+  }
+
+  .jwst-credit {
+    justify-content: center;
+  }
+
+  .image-navigation {
+    align-self: center;
+  }
+
+  .nebula-cloud {
+    filter: blur(50px);
+  }
+
+  .cloud-1,
+  .cloud-2,
+  .cloud-3 {
+    width: 400px;
+    height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .image-info {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+  }
+
+  .info-content {
+    padding: 15px;
+  }
+
+  .image-title {
+    font-size: 1rem;
+  }
+
+  .image-description {
+    font-size: 0.8rem;
+  }
+
+  .nav-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .image-navigation {
+    padding: 10px;
+    gap: 8px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .overlay-gradient {
+    background: linear-gradient(180deg, 
+      rgba(0, 0, 0, 0.7) 0%, 
+      rgba(0, 0, 0, 0.5) 50%, 
+      rgba(0, 0, 0, 0.8) 100%
+    );
+  }
+
+  .info-content {
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .background-layer.primary,
+  .particle,
+  .nebula-cloud,
+  .cosmic-dust,
+  .light-effects {
+    animation: none;
+  }
+
+  .background-layer.primary {
+    transition: opacity 0.5s ease;
+  }
+}
