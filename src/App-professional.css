@@ -319,6 +319,20 @@ body {
   background: transparent !important;
 }
 
+/* Mobile Override for Main Content */
+@media (max-width: 768px) {
+  .main-content {
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+  }
+}
+
 /* Universe Explorer - Full Height */
 .universe-explorer {
   height: calc(100vh - 80px);
@@ -1585,11 +1599,23 @@ body {
 }
 
 @media (max-width: 768px) {
+  /* iOS Safe Area Support */
+  .app-professional {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  /* Mobile Navigation */
   .professional-nav {
+    position: fixed;
     height: auto;
+    min-height: 100px;
     flex-direction: column;
-    padding: 15px;
-    gap: 15px;
+    padding: 10px 15px 15px 15px;
+    gap: 10px;
+    top: env(safe-area-inset-top, 0);
   }
   
   .nav-brand {
@@ -1597,91 +1623,311 @@ body {
     text-align: center;
   }
   
+  .nav-brand h1 {
+    font-size: 1.6rem;
+    margin-bottom: 4px;
+  }
+  
+  .nav-brand p {
+    font-size: 0.7rem;
+    margin: 0;
+  }
+  
   .nav-tabs {
     flex-direction: row;
     overflow-x: auto;
+    overflow-y: hidden;
     width: 100%;
-    padding-bottom: 5px;
+    padding: 8px 0 12px 0;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .nav-tabs::-webkit-scrollbar {
+    display: none;
   }
   
   .nav-tab {
-    min-width: 120px;
-    padding: 8px 12px;
+    min-width: 80px;
+    max-width: 100px;
+    padding: 8px 10px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   
+  .tab-label {
+    display: none;
+  }
+  
+  .tab-icon {
+    font-size: 1.1rem;
+    margin: 0;
+  }
+  
+  /* Mobile Main Content - Critical Fix */
   .main-content {
-    margin-top: 120px;
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    margin-top: 110px;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding-bottom: 40px;
+    padding-bottom: calc(40px + env(safe-area-inset-bottom));
   }
   
+  /* Mobile Content Sections */
+  .universe-explorer {
+    height: auto !important;
+    min-height: calc(100vh - 150px);
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+  
+  .universe-content {
+    height: auto !important;
+    min-height: calc(100vh - 150px);
+  }
+  
+  .graph-section {
+    height: auto !important;
+    min-height: calc(100vh - 200px);
+    width: 100%;
+  }
+  
+  .explorer-header {
+    position: relative !important;
+    top: 0 !important;
+    right: 0 !important;
+    margin: 15px;
+    margin-bottom: 20px;
+    max-width: none;
+    z-index: 5;
+  }
+  
+  /* Mobile Content Containers */
   .neo-tracker,
   .cosmos-explorer,
   .author-section {
-    padding: 20px;
+    padding: 15px;
+    overflow-y: auto;
+    max-height: none !important;
+    height: auto !important;
   }
   
+  .simple-physics-demo {
+    padding: 15px;
+    margin: 15px;
+  }
+  
+  /* Mobile Grid Layouts */
   .apod-card {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
   
-  .author-hero {
+  .mission-grid {
     grid-template-columns: 1fr;
-    text-align: center;
-    gap: 30px;
+    gap: 15px;
+  }
+  
+  .statistics-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 30px;
   }
   
   .achievements-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
   
+  .passions-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  /* Mobile Author Section */
+  .author-hero {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    text-align: center;
+    padding: 25px 15px;
+    margin-bottom: 40px;
+  }
+  
+  .philosophy-card {
+    padding: 30px 20px 80px 20px;
+    margin-bottom: 60px;
+  }
+  
+  .philosophy-card blockquote {
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  
+  /* Mobile Headers */
+  .tracker-header,
+  .cosmos-header,
+  .author-header {
+    margin-bottom: 25px;
+    padding: 0 15px;
+  }
+  
+  .tracker-header h2,
+  .cosmos-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .author-header h2 {
+    font-size: 2.2rem;
+  }
+  
+  /* Mobile Tables and Lists */
+  .neo-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .table-row {
+    min-width: 600px;
+    padding: 10px 8px;
+  }
+  
+  .table-header {
+    min-width: 600px;
+    padding: 12px 8px;
+  }
+  
+  /* Mobile Discovery Lists */
+  .discovery-list {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* Mobile Node Details */
+  .object-details {
+    margin: 15px;
+    padding: 20px;
+    position: relative;
+    width: auto;
+    margin-top: 20px;
+  }
+  
+  .detail-sections {
+    gap: 20px;
+  }
+  
+  /* Mobile Physics Controls */
+  .controls-panel {
+    padding: 15px;
+    margin: 15px;
+  }
+  
+  .control-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  /* Achievement Cards Mobile */
   .achievement-card {
     grid-template-columns: 1fr;
     text-align: center;
     gap: 15px;
   }
-  
-  .object-details {
-    position: relative;
-    width: 100%;
-    margin-top: 20px;
-  }
-  
-  .table-header,
-  .table-row {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  
-  .table-header span,
-  .table-row span {
-    padding: 5px 0;
-  }
 }
 
 @media (max-width: 480px) {
-  .author-header h2 {
-    font-size: 2rem;
+  /* Extra Small Mobile Devices */
+  .nav-brand h1 {
+    font-size: 1.4rem;
   }
   
-  .cosmos-header h2,
-  .tracker-header h2 {
-    font-size: 1.8rem;
+  .nav-brand p {
+    font-size: 0.65rem;
   }
   
-  .philosophy-card {
-    padding: 30px 20px;
+  .nav-tab {
+    min-width: 70px;
+    max-width: 85px;
+    padding: 6px 8px;
+    font-size: 0.65rem;
+    justify-content: center;
   }
   
-  .philosophy-card blockquote {
-    font-size: 1.1rem;
+  .tab-icon {
+    font-size: 1rem;
   }
   
   .nav-tab .tab-label {
     display: none;
   }
   
-  .nav-tab {
-    min-width: 50px;
-    justify-content: center;
+  .author-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .cosmos-header h2,
+  .tracker-header h2 {
+    font-size: 1.6rem;
+  }
+  
+  .philosophy-card {
+    padding: 25px 15px 70px 15px;
+    margin-bottom: 50px;
+  }
+  
+  .philosophy-card blockquote {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  /* Extra padding for very small screens */
+  .neo-tracker,
+  .cosmos-explorer,
+  .author-section {
+    padding: 12px;
+  }
+  
+  .main-content {
+    margin-top: 105px !important;
+    padding-bottom: 30px;
+  }
+  
+  .statistics-grid {
+    gap: 12px;
+  }
+  
+  .stat-card {
+    padding: 15px;
+  }
+  
+  .stat-number {
+    font-size: 2.2rem;
+  }
+  
+  .object-details {
+    margin: 12px;
+    padding: 15px;
+  }
+  
+  .explorer-header {
+    margin: 12px;
+    padding: 15px;
+  }
+  
+  .apod-card {
+    gap: 15px;
+  }
+  
+  .mission-card {
+    padding: 15px;
   }
 }
 

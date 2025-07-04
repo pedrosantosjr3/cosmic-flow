@@ -1,0 +1,172 @@
+/* Mobile-Specific Fixes for iPhone and Touch Devices */
+
+/* Prevent zoom on input focus and improve touch handling */
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+  position: relative;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Ensure content is always scrollable on mobile */
+@media (max-width: 768px) {
+  html, body {
+    height: auto !important;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative !important;
+  }
+  
+  .app-professional {
+    min-height: 100vh;
+    height: auto !important;
+    overflow: visible !important;
+    position: relative !important;
+  }
+  
+  /* Critical: Make main content scrollable on mobile */
+  .main-content {
+    position: static !important;
+    margin-top: 0 !important;
+    padding-top: 120px !important;
+    height: auto !important;
+    min-height: calc(100vh - 60px) !important;
+    overflow: visible !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Mobile navigation fixed position with proper z-index */
+  .professional-nav {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999 !important;
+    background: rgba(0, 0, 0, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+  }
+  
+  /* Ensure all content sections are properly sized */
+  .neo-tracker,
+  .cosmos-explorer,
+  .author-section,
+  .universe-explorer {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    position: relative !important;
+  }
+  
+  /* Fix universe graph container */
+  .universe-content {
+    position: relative !important;
+    height: auto !important;
+    min-height: 70vh;
+  }
+  
+  .graph-section {
+    position: relative !important;
+    height: auto !important;
+    min-height: 60vh;
+  }
+  
+  /* Ensure proper spacing at bottom */
+  .main-content::after {
+    content: '';
+    display: block;
+    height: 60px;
+    width: 100%;
+  }
+  
+  /* Touch-friendly button sizes */
+  .nav-tab {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Improve table scrolling on mobile */
+  .neo-table {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* Prevent content from being hidden behind navigation */
+  .tracker-header,
+  .cosmos-header,
+  .author-header,
+  .explorer-header {
+    position: relative !important;
+    z-index: 1;
+  }
+}
+
+/* iPhone specific fixes */
+@media (max-width: 480px) and (-webkit-min-device-pixel-ratio: 2) {
+  .main-content {
+    padding-top: 110px !important;
+    padding-bottom: 50px !important;
+  }
+  
+  .professional-nav {
+    min-height: 110px !important;
+  }
+  
+  /* Improve touch targets for iPhone */
+  .nav-tab {
+    min-height: 48px;
+    min-width: 75px;
+  }
+  
+  /* Better spacing for iPhone screens */
+  .neo-tracker,
+  .cosmos-explorer,
+  .author-section {
+    padding: 10px 12px 30px 12px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .professional-nav {
+    min-height: 80px !important;
+  }
+  
+  .main-content {
+    padding-top: 90px !important;
+  }
+  
+  .nav-brand h1 {
+    font-size: 1.3rem;
+  }
+  
+  .nav-brand p {
+    font-size: 0.6rem;
+  }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .main-content {
+    /* Account for iOS Safari bottom bar */
+    padding-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
+  }
+  
+  .professional-nav {
+    /* Account for iOS notch */
+    padding-top: calc(10px + env(safe-area-inset-top));
+    top: 0;
+  }
+}
