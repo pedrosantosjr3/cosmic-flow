@@ -1477,20 +1477,11 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                   <button 
                     onClick={() => {
                       console.log('Zoom In clicked', { svgRef: !!svgRef.current, zoomRef: !!zoomRef.current })
-                      if (svgRef.current && zoomRef.current) {
-                        try {
-                          const svg = d3.select(svgRef.current)
-                          console.log('Attempting D3 zoom in...')
-                          svg.transition().duration(300).ease(d3.easeQuadOut).call(
-                            zoomRef.current.scaleBy, 1.5
-                          )
-                        } catch (error) {
-                          console.error('D3 zoom failed, using manual zoom:', error)
-                          manualZoom(1.5)
-                        }
-                      } else {
-                        console.log('Using manual zoom fallback')
-                        manualZoom(1.5)
+                      // Always use manual zoom for reliability
+                      console.log('Using manual zoom for zoom in')
+                      const success = manualZoom(1.5)
+                      if (!success) {
+                        console.error('Manual zoom failed!')
                       }
                     }}
                     className="zoom-btn zoom-in"
@@ -1501,20 +1492,11 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                   <button 
                     onClick={() => {
                       console.log('Zoom Out clicked', { svgRef: !!svgRef.current, zoomRef: !!zoomRef.current })
-                      if (svgRef.current && zoomRef.current) {
-                        try {
-                          const svg = d3.select(svgRef.current)
-                          console.log('Attempting D3 zoom out...')
-                          svg.transition().duration(300).ease(d3.easeQuadOut).call(
-                            zoomRef.current.scaleBy, 0.67
-                          )
-                        } catch (error) {
-                          console.error('D3 zoom failed, using manual zoom:', error)
-                          manualZoom(0.67)
-                        }
-                      } else {
-                        console.log('Using manual zoom fallback')
-                        manualZoom(0.67)
+                      // Always use manual zoom for reliability
+                      console.log('Using manual zoom for zoom out')
+                      const success = manualZoom(0.67)
+                      if (!success) {
+                        console.error('Manual zoom failed!')
                       }
                     }}
                     className="zoom-btn zoom-out"
@@ -1525,19 +1507,11 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                   <button 
                     onClick={() => {
                       console.log('Reset clicked')
-                      if (svgRef.current && zoomRef.current) {
-                        try {
-                          const svg = d3.select(svgRef.current)
-                          svg.transition().duration(500).ease(d3.easeQuadInOut).call(
-                            zoomRef.current.transform, d3.zoomIdentity
-                          )
-                        } catch (error) {
-                          console.error('D3 reset failed, using manual reset:', error)
-                          manualReset()
-                        }
-                      } else {
-                        console.log('Using manual reset fallback')
-                        manualReset()
+                      // Always use manual reset for reliability
+                      console.log('Using manual reset')
+                      const success = manualReset()
+                      if (!success) {
+                        console.error('Manual reset failed!')
                       }
                     }}
                     className="zoom-btn reset"

@@ -138,7 +138,6 @@ body {
   
   /* Prevent content from being hidden behind navigation */
   .tracker-header,
-  .cosmos-header,
   .author-header,
   .explorer-header {
     position: relative !important;
