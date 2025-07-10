@@ -247,6 +247,7 @@ const App: React.FC = () => {
   })
   const [weatherAlerts, setWeatherAlerts] = useState<any[]>([])
   const [severeWeatherEvents, setSevereWeatherEvents] = useState<SevereWeatherEvent[]>([])
+  const [globalWeatherEvents, setGlobalWeatherEvents] = useState<any[]>([])
   const [weatherLastUpdated, setWeatherLastUpdated] = useState<string>('')
   const [backgroundImage, setBackgroundImage] = useState<string>('')
   const [showSolarSystem, setShowSolarSystem] = useState(false)
@@ -339,6 +340,7 @@ const App: React.FC = () => {
       // Set comprehensive weather data
       setWeatherAlerts(comprehensiveWeatherData.alerts)
       setSevereWeatherEvents(comprehensiveWeatherData.severeEvents)
+      setGlobalWeatherEvents(comprehensiveWeatherData.globalEvents || [])
       setWeatherLastUpdated(comprehensiveWeatherData.lastUpdated)
       
       console.log('Successfully loaded real-time NASA data')
@@ -1916,6 +1918,7 @@ const App: React.FC = () => {
           <EarthWeatherImproved 
             weatherAlerts={weatherAlerts}
             severeWeatherEvents={severeWeatherEvents}
+            globalEvents={globalWeatherEvents}
             weatherLastUpdated={weatherLastUpdated}
           />
         )

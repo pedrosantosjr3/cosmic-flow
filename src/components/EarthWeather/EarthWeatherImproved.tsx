@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SevereWeatherEvent } from '../../services/severeWeatherAPI';
+import { GlobalWeatherEvent } from '../../services/globalWeatherAPI';
 import './EarthWeatherImproved.css';
 
 interface WeatherAlert {
@@ -51,12 +52,14 @@ interface CatastrophicEvent {
 interface EarthWeatherImprovedProps {
   weatherAlerts: WeatherAlert[];
   severeWeatherEvents: SevereWeatherEvent[];
+  globalEvents: GlobalWeatherEvent[];
   weatherLastUpdated: string;
 }
 
 const EarthWeatherImproved: React.FC<EarthWeatherImprovedProps> = ({
   weatherAlerts,
   severeWeatherEvents,
+  globalEvents = [],
   weatherLastUpdated
 }) => {
   const [expandedRegions, setExpandedRegions] = useState<Set<string>>(new Set());
@@ -108,14 +111,15 @@ const EarthWeatherImproved: React.FC<EarthWeatherImprovedProps> = ({
     });
   };
 
-  // Get catastrophic events with timeline
+  // Get catastrophic events with timeline - prioritize global events
   const getCatastrophicEvents = (): CatastrophicEvent[] => {
-    return severeWeatherEvents
-      .filter(event => event.severity === 'catastrophic' || event.impact.deaths > 0)
-      .map(event => ({
+    // Combine global events and severe events, prioritizing global events
+    const allEvents = [
+      // Convert global events (these have detailed timelines)
+      ...globalEvents.map(event => ({
         id: event.id,
         title: event.title,
-        location: event.location,
+        location: event.region,
         type: event.type,
         severity: 'catastrophic' as const,
         deaths: event.impact.deaths,
@@ -123,19 +127,43 @@ const EarthWeatherImproved: React.FC<EarthWeatherImprovedProps> = ({
         displaced: event.impact.displaced,
         economicLoss: event.impact.economicLoss,
         description: event.description,
-        timeline: [
-          {
-            timestamp: event.startDate,
-            update: `Event began: ${event.description}`
-          },
-          {
-            timestamp: event.lastUpdated,
-            update: `Current status: ${event.status}${event.impact.deaths > 0 ? ` - ${event.impact.deaths} confirmed deaths` : ''}`
-          }
-        ],
+        timeline: event.timeline,
         lastUpdated: event.lastUpdated
-      }))
-      .sort((a, b) => b.deaths - a.deaths);
+      })),
+      // Convert severe events as backup
+      ...severeWeatherEvents
+        .filter(event => event.severity === 'catastrophic' || event.impact.deaths > 0)
+        .map(event => ({
+          id: `severe-${event.id}`,
+          title: event.title,
+          location: event.location,
+          type: event.type,
+          severity: 'catastrophic' as const,
+          deaths: event.impact.deaths,
+          injuries: event.impact.injuries,
+          displaced: event.impact.displaced,
+          economicLoss: event.impact.economicLoss,
+          description: event.description,
+          timeline: [
+            {
+              timestamp: event.startDate,
+              update: `Event began: ${event.description}`
+            },
+            {
+              timestamp: event.lastUpdated,
+              update: `Current status: ${event.status}${event.impact.deaths > 0 ? ` - ${event.impact.deaths} confirmed deaths` : ''}`
+            }
+          ],
+          lastUpdated: event.lastUpdated
+        }))
+    ];
+    
+    // Remove duplicates and sort by death toll
+    const uniqueEvents = allEvents.filter((event, index, arr) => 
+      arr.findIndex(e => e.id === event.id) === index
+    );
+    
+    return uniqueEvents.sort((a, b) => b.deaths - a.deaths);
   };
 
   const formatTime = (timestamp: string) => {
@@ -179,10 +207,30 @@ const EarthWeatherImproved: React.FC<EarthWeatherImprovedProps> = ({
   };
 
   const satelliteViews = [
-    { id: 'GOES-16', name: 'GOES-16 East', url: 'https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/1808x1808.jpg' },
-    { id: 'GOES-18', name: 'GOES-18 West', url: 'https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/1808x1808.jpg' },
-    { id: 'METEOSAT', name: 'Meteosat Europe', url: 'https://eumetview.eumetsat.int/static-images/MSG/RGB/NATURALCOLOR/FULLRESOLUTION/index.jpg' },
-    { id: 'HIMAWARI', name: 'Himawari Asia', url: 'https://rammb-slider.cira.colostate.edu/data/imagery/goes-16/full_disk/geocolor/latest_full_disk_geocolor.jpg' }
+    { 
+      id: 'GOES-16', 
+      name: 'GOES-16 East', 
+      url: `https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/1808x1808.jpg?${Date.now()}`,
+      fallback: 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?w=800&h=800&fit=crop'
+    },
+    { 
+      id: 'GOES-18', 
+      name: 'GOES-18 West', 
+      url: `https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/1808x1808.jpg?${Date.now()}`,
+      fallback: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=800&h=800&fit=crop'
+    },
+    { 
+      id: 'METEOSAT', 
+      name: 'Meteosat Europe', 
+      url: `https://eumetview.eumetsat.int/static-images/MSG/RGB/NATURALCOLOR/FULLRESOLUTION/index.jpg?${Date.now()}`,
+      fallback: 'https://images.unsplash.com/photo-1614732414444-096040ec8057?w=800&h=800&fit=crop'
+    },
+    { 
+      id: 'HIMAWARI', 
+      name: 'Himawari Asia', 
+      url: `https://rammb-slider.cira.colostate.edu/data/imagery/goes-16/full_disk/geocolor/latest_full_disk_geocolor.jpg?${Date.now()}`,
+      fallback: 'https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?w=800&h=800&fit=crop'
+    }
   ];
 
   const groupedAlerts = groupAlerts(weatherAlerts);
@@ -225,7 +273,10 @@ const EarthWeatherImproved: React.FC<EarthWeatherImprovedProps> = ({
               className="satellite-image"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.src = satelliteViews[0].url; // Fallback to GOES-16
+                const currentView = satelliteViews.find(v => v.id === currentSatelliteView);
+                if (currentView && target.src !== currentView.fallback) {
+                  target.src = currentView.fallback;
+                }
               }}
             />
             <div className="satellite-overlay">

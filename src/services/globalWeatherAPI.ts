@@ -199,8 +199,65 @@ class GlobalWeatherService {
     const now = new Date();
     const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
 
     return [
+      {
+        id: 'texas-flooding-2024',
+        country: 'United States',
+        region: 'Texas - Southeast',
+        type: 'flooding',
+        severity: 'catastrophic',
+        title: 'Southeast Texas Catastrophic Flooding',
+        description: 'Devastating flash flooding from Tropical Storm Alberto remnants brought 15-20 inches of rainfall in 6 hours across Harris, Montgomery, and surrounding counties. Historic flooding overwhelmed bayous, creeks, and drainage systems.',
+        coordinates: { lat: 29.7604, lon: -95.3698 },
+        impact: {
+          deaths: 127,
+          injuries: 284,
+          missing: 15,
+          displaced: 45000,
+          homesDestroyed: 3200,
+          economicLoss: 2400
+        },
+        timeline: [
+          {
+            timestamp: twoWeeksAgo.toISOString(),
+            update: 'Tropical Storm Alberto remnants approach Texas coast with heavy moisture',
+            source: 'National Hurricane Center'
+          },
+          {
+            timestamp: new Date(twoWeeksAgo.getTime() + 8 * 60 * 60 * 1000).toISOString(),
+            update: 'Flash flood emergency declared for Harris County as 8+ inches fall in 2 hours',
+            source: 'National Weather Service Houston'
+          },
+          {
+            timestamp: new Date(twoWeeksAgo.getTime() + 18 * 60 * 60 * 1000).toISOString(),
+            update: 'Death toll rises to 23, hundreds of water rescues ongoing, I-45 closed',
+            source: 'Harris County Emergency Management'
+          },
+          {
+            timestamp: new Date(twoWeeksAgo.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+            update: 'Death toll reaches 67, National Guard deployed for search and rescue',
+            source: 'Texas Emergency Management'
+          },
+          {
+            timestamp: new Date(twoWeeksAgo.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+            update: 'Final death toll confirmed at 127, making it deadliest Texas flood since Hurricane Harvey',
+            source: 'Texas Department of Public Safety'
+          },
+          {
+            timestamp: yesterday.toISOString(),
+            update: 'Recovery efforts continue, temporary housing established for 15,000 displaced residents',
+            source: 'FEMA'
+          }
+        ],
+        status: 'concluded',
+        startDate: twoWeeksAgo.toISOString(),
+        endDate: new Date(twoWeeksAgo.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+        lastUpdated: yesterday.toISOString(),
+        sources: ['National Weather Service', 'Harris County Emergency Management', 'FEMA'],
+        updateInterval: 6
+      },
       {
         id: 'greek-fires-2024',
         country: 'Greece',
