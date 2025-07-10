@@ -274,7 +274,7 @@
 
 .table-header {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 80px 60px 100px;
+  grid-template-columns: 150px 120px 180px 1fr 150px 80px 100px;
   gap: 10px;
   padding: 15px;
   background: rgba(74, 144, 226, 0.2);
@@ -285,7 +285,7 @@
 
 .visitor-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 80px 60px 100px;
+  grid-template-columns: 150px 120px 180px 1fr 150px 80px 100px;
   gap: 10px;
   padding: 12px 15px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);

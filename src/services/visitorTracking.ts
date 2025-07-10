@@ -10,6 +10,9 @@ interface VisitorData {
     timezone?: string;
     lat?: number;
     lon?: number;
+    isp?: string;
+    org?: string;
+    as?: string;
   };
   device: {
     type: 'mobile' | 'tablet' | 'desktop';
@@ -87,10 +90,36 @@ class VisitorTrackingService {
 
   private async getLocationData(): Promise<any> {
     try {
-      // Use a free IP geolocation service
-      const response = await fetch('https://ipapi.co/json/');
-      if (response.ok) {
-        return await response.json();
+      // Try multiple IP services for better data
+      const services = [
+        'https://ipapi.co/json/',
+        'https://ipinfo.io/json',
+        'https://api.ipdata.co?api-key=test' // test key for basic data
+      ];
+      
+      for (const service of services) {
+        try {
+          const response = await fetch(service);
+          if (response.ok) {
+            const data = await response.json();
+            
+            // Normalize data from different services
+            return {
+              ip: data.ip,
+              country_name: data.country_name || data.country,
+              region: data.region || data.region_name,
+              city: data.city,
+              timezone: data.timezone || data.time_zone?.name,
+              latitude: data.latitude || data.loc?.split(',')[0],
+              longitude: data.longitude || data.loc?.split(',')[1],
+              org: data.org || data.organisation || data.company?.name,
+              isp: data.isp || data.asn?.name,
+              asn: data.asn || data.as
+            };
+          }
+        } catch (err) {
+          continue; // Try next service
+        }
       }
     } catch (error) {
       console.log('Location data unavailable');
@@ -195,6 +224,7 @@ class VisitorTrackingService {
       const visitorData: VisitorData = {
         id: this.visitorId,
         timestamp: new Date().toISOString(),
+        ip: locationData.ip,
         userAgent: navigator.userAgent,
         location: {
           country: locationData.country_name,
@@ -202,7 +232,10 @@ class VisitorTrackingService {
           city: locationData.city,
           timezone: locationData.timezone,
           lat: locationData.latitude,
-          lon: locationData.longitude
+          lon: locationData.longitude,
+          isp: locationData.org || locationData.isp,
+          org: locationData.org,
+          as: locationData.asn
         },
         device: deviceInfo,
         session: {

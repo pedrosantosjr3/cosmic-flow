@@ -319,19 +319,21 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ onClose }) => {
               <div className="visitors-table">
                 <div className="table-header">
                   <span>Timestamp</span>
+                  <span>IP Address</span>
+                  <span>ISP/Organization</span>
                   <span>Location</span>
                   <span>Device</span>
                   <span>Duration</span>
-                  <span>Pages</span>
                   <span>Actions</span>
                 </div>
                 {visitors.slice(0, 50).map(visitor => (
                   <div key={visitor.id + visitor.timestamp} className="visitor-row">
                     <span>{new Date(visitor.timestamp).toLocaleString()}</span>
+                    <span>{visitor.ip || 'Unknown'}</span>
+                    <span>{visitor.location.isp || visitor.location.org || 'Unknown'}</span>
                     <span>{formatLocation(visitor)}</span>
                     <span>{visitor.device.type} - {visitor.device.browser}</span>
                     <span>{formatDuration(visitor.session.duration)}</span>
-                    <span>{visitor.session.pageViews}</span>
                     <button onClick={() => setSelectedVisitor(visitor)}>View Details</button>
                   </div>
                 ))}
@@ -349,12 +351,15 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ onClose }) => {
                 </div>
                 <div className="visitor-details">
                   <div className="detail-section">
-                    <h3>📍 Location & Technical</h3>
+                    <h3>📍 Location & Network</h3>
+                    <p><strong>IP Address:</strong> {selectedVisitor.ip || 'Unknown'}</p>
+                    <p><strong>ISP/Organization:</strong> {selectedVisitor.location.isp || selectedVisitor.location.org || 'Unknown'}</p>
+                    <p><strong>Network AS:</strong> {selectedVisitor.location.as || 'Unknown'}</p>
                     <p><strong>Country:</strong> {selectedVisitor.location.country || 'Unknown'}</p>
                     <p><strong>Region:</strong> {selectedVisitor.location.region || 'Unknown'}</p>
                     <p><strong>City:</strong> {selectedVisitor.location.city || 'Unknown'}</p>
                     <p><strong>Timezone:</strong> {selectedVisitor.location.timezone || 'Unknown'}</p>
-                    <p><strong>IP Location:</strong> {selectedVisitor.location.lat && selectedVisitor.location.lon ? 
+                    <p><strong>Coordinates:</strong> {selectedVisitor.location.lat && selectedVisitor.location.lon ? 
                       `${selectedVisitor.location.lat}, ${selectedVisitor.location.lon}` : 'Unknown'}</p>
                   </div>
 
