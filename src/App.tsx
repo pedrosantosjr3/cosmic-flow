@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react'
 import UniverseGraph from './components/UniverseGraph/UniverseGraph'
 import UpdateStatus from './components/UpdateStatus/UpdateStatus'
 import EarthWeatherImproved from './components/EarthWeather/EarthWeatherImproved'
+import AnalyticsDashboard from './components/Analytics/AnalyticsDashboard'
 import { NeoObject, ApodData } from './services/nasaAPI'
 import { enhancedNasaAPI } from './services/enhancedNasaAPI'
 import { SevereWeatherEvent } from './services/severeWeatherAPI'
 import { dateValidator, getTimeSinceEvent } from './utils/dateValidation'
 import { dataUpdateScheduler } from './services/dataUpdateScheduler'
 import { dataStorage } from './services/dataStorage'
+import { visitorTracker } from './services/visitorTracking'
 import './App-professional.css'
 import './enhanced-styles.css'
 import './background-override.css'
@@ -235,6 +237,7 @@ const App: React.FC = () => {
   const [showBlackHoleSim, setShowBlackHoleSim] = useState(false)
   const [showQuantumSim, setShowQuantumSim] = useState(false)
   const [showEMWaves, setShowEMWaves] = useState(false)
+  const [showAnalytics, setShowAnalytics] = useState(false)
   const [cosmicData, setCosmicData] = useState<CosmicData>({
     neoObjects: [],
     hazardousAsteroids: [],
@@ -400,6 +403,25 @@ const App: React.FC = () => {
   const handleNodeClick = (node: UniverseNode) => {
     setSelectedNode(node)
   }
+
+  // Initialize visitor tracking and handle tab changes
+  useEffect(() => {
+    // Track tab changes
+    visitorTracker.trackPageChange(activeTab)
+  }, [activeTab])
+
+  // Add keyboard shortcut for analytics (Ctrl+Shift+A)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.shiftKey && event.key === 'A') {
+        event.preventDefault()
+        setShowAnalytics(true)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
   
   const launchSolarSystemSimulation = () => {
     setShowSolarSystem(true)
@@ -1983,6 +2005,11 @@ const App: React.FC = () => {
       
       {/* Update Status Indicator */}
       <UpdateStatus />
+
+      {/* Analytics Dashboard - Hidden, only accessible via Ctrl+Shift+A */}
+      {showAnalytics && (
+        <AnalyticsDashboard onClose={() => setShowAnalytics(false)} />
+      )}
     </div>
   )
 }
