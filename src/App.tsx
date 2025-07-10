@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react'
 import UniverseGraph from './components/UniverseGraph/UniverseGraph'
 import Universe3D from './components/Universe3D/Universe3D'
 import UpdateStatus from './components/UpdateStatus/UpdateStatus'
+import EarthWeather from './components/EarthWeather/EarthWeather'
 import { NeoObject, ApodData } from './services/nasaAPI'
 import { enhancedNasaAPI } from './services/enhancedNasaAPI'
+import { SevereWeatherEvent } from './services/severeWeatherAPI'
 import { dateValidator, getTimeSinceEvent } from './utils/dateValidation'
 import { dataUpdateScheduler } from './services/dataUpdateScheduler'
 import { dataStorage } from './services/dataStorage'
@@ -244,6 +246,8 @@ const App: React.FC = () => {
     error: null
   })
   const [weatherAlerts, setWeatherAlerts] = useState<any[]>([])
+  const [severeWeatherEvents, setSevereWeatherEvents] = useState<SevereWeatherEvent[]>([])
+  const [weatherLastUpdated, setWeatherLastUpdated] = useState<string>('')
   const [backgroundImage, setBackgroundImage] = useState<string>('')
   const [showSolarSystem, setShowSolarSystem] = useState(false)
 
@@ -286,17 +290,17 @@ const App: React.FC = () => {
     
     try {
       // Check if we should use stored data first
-      let neoData, apodData, weatherData
+      let neoData, apodData, comprehensiveWeatherData
       
       if (preferStoredData) {
         // Try to load from storage first
         const storedNeo = dataStorage.load<any>('neo-data')
-        const storedWeather = dataStorage.load<any>('weather-data')
+        const storedWeather = dataStorage.load<any>('weather-comprehensive')
         
         if (storedNeo && storedWeather) {
           console.log('Loading data from local storage...')
           neoData = storedNeo
-          weatherData = storedWeather
+          comprehensiveWeatherData = storedWeather
           // Still fetch APOD as it changes daily
           apodData = await enhancedNasaAPI.getCurrentAPOD(false)
         } else {
@@ -305,22 +309,22 @@ const App: React.FC = () => {
           const results = await Promise.all([
             enhancedNasaAPI.getCurrentNEOs(),
             enhancedNasaAPI.getCurrentAPOD(),
-            enhancedNasaAPI.getCurrentWeatherAlerts()
+            enhancedNasaAPI.getCurrentWeatherData()
           ])
           neoData = results[0]
           apodData = results[1]
-          weatherData = results[2]
+          comprehensiveWeatherData = results[2]
         }
       } else {
         // Normal API fetch
         const results = await Promise.all([
           enhancedNasaAPI.getCurrentNEOs(),
           enhancedNasaAPI.getCurrentAPOD(),
-          enhancedNasaAPI.getCurrentWeatherAlerts()
+          enhancedNasaAPI.getCurrentWeatherData()
         ])
         neoData = results[0]
         apodData = results[1]
-        weatherData = results[2]
+        comprehensiveWeatherData = results[2]
       }
       
       setCosmicData({
@@ -332,12 +336,16 @@ const App: React.FC = () => {
         error: null
       })
       
-      setWeatherAlerts(weatherData)
+      // Set comprehensive weather data
+      setWeatherAlerts(comprehensiveWeatherData.alerts)
+      setSevereWeatherEvents(comprehensiveWeatherData.severeEvents)
+      setWeatherLastUpdated(comprehensiveWeatherData.lastUpdated)
       
       console.log('Successfully loaded real-time NASA data')
       console.log(`Tracking ${neoData.stats.totalTracked} NEOs, ${neoData.stats.hazardousCount} hazardous`)
       console.log(`Closest approach: ${(neoData.stats.closestApproachKm / 1000000).toFixed(2)}M km`)
-      console.log(`Active weather alerts: ${weatherData.length}`)
+      console.log(`Active weather alerts: ${comprehensiveWeatherData.alerts.length}`)
+      console.log(`Severe weather events: ${comprehensiveWeatherData.severeEvents.length}`)
       console.log('Weather alerts loaded:', weatherAlerts.length) // Use weatherAlerts to avoid TS warning
       console.log('EM waves modal state:', showEMWaves, setShowEMWaves) // Use showEMWaves to avoid TS warning
     } catch (error) {
@@ -1344,6 +1352,8 @@ const App: React.FC = () => {
     </div>
   )
 
+  /*
+  // Legacy renderEarthWeather function - now using EarthWeather component
   const renderEarthWeather = () => (
     <div className="earth-weather">
       <div className="weather-header">
@@ -1627,6 +1637,7 @@ const App: React.FC = () => {
       </div>
     </div>
   )
+  */
 
   const renderAuthorSection = () => (
     <div className="author-section">
@@ -1901,7 +1912,13 @@ const App: React.FC = () => {
       case 'neo-tracker':
         return renderNEOTracker()
       case 'earth-weather':
-        return renderEarthWeather()
+        return (
+          <EarthWeather 
+            weatherAlerts={weatherAlerts}
+            severeWeatherEvents={severeWeatherEvents}
+            weatherLastUpdated={weatherLastUpdated}
+          />
+        )
       case 'cosmos':
         return renderCosmosExplorer()
       case 'author':

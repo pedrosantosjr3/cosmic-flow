@@ -2,6 +2,7 @@ import { nasaAPI, NeoObject, ApodData } from './nasaAPI'
 import { dateValidator } from '../utils/dateValidation'
 import { dataStorage } from './dataStorage'
 import { weatherAPI, WeatherAlert } from './weatherAPI'
+import { severeWeatherAPI, SevereWeatherEvent } from './severeWeatherAPI'
 
 interface CachedData<T> {
   data: T
@@ -84,7 +85,7 @@ export class EnhancedNASAApiService {
       })
       
       // Categorize NEOs
-      const now = new Date('2025-07-04')
+      const now = new Date()
       const hazardousNeos = currentNeos.filter(neo => neo.is_potentially_hazardous_asteroid)
       const upcomingApproaches = currentNeos.filter(neo => {
         const approachDate = new Date(neo.close_approach_data[0].close_approach_date)
@@ -159,12 +160,12 @@ export class EnhancedNASAApiService {
       console.error('Error fetching APOD:', error)
       // Return mock APOD
       return {
-        date: '2025-07-04',
+        date: new Date().toISOString().split('T')[0],
         explanation: 'Today\'s image showcases a stunning view of the Andromeda Galaxy captured by the James Webb Space Telescope.',
         hdurl: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1920&h=1080',
         media_type: 'image',
         service_version: 'v1',
-        title: 'Andromeda Galaxy in Infrared - JWST July 2025',
+        title: `Andromeda Galaxy in Infrared - JWST ${new Date().getFullYear()}`,
         url: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&h=600',
         copyright: 'NASA, ESA, CSA, STScI'
       }
@@ -242,6 +243,60 @@ export class EnhancedNASAApiService {
     this.setupAutoRefresh(cacheKey, () => this.getCurrentWeatherAlerts())
     
     return currentAlerts
+  }
+  
+  // Get comprehensive weather data including severe events with impact data
+  async getCurrentWeatherData(forceRefresh: boolean = false, skipAPICall: boolean = false): Promise<{
+    alerts: WeatherAlert[]
+    severeEvents: SevereWeatherEvent[]
+    lastUpdated: string
+  }> {
+    const cacheKey = 'weather-data-comprehensive'
+    const storageKey = 'weather-comprehensive'
+    
+    // Check memory cache first
+    if (!forceRefresh && this.hasValidCache(cacheKey)) {
+      return this.getFromCache(cacheKey)
+    }
+    
+    // Check persistent storage if not forcing refresh and skipAPICall is true
+    if (!forceRefresh && skipAPICall) {
+      const storedData = dataStorage.load<any>(storageKey)
+      if (storedData) {
+        // Update memory cache from storage
+        this.setCache(cacheKey, storedData, 5)
+        return storedData
+      }
+    }
+    
+    try {
+      // Fetch both regular alerts and severe events
+      const [alerts, severeEvents] = await Promise.all([
+        this.getCurrentWeatherAlerts(forceRefresh, skipAPICall),
+        severeWeatherAPI.getCurrentSevereEvents()
+      ])
+      
+      const result = {
+        alerts,
+        severeEvents,
+        lastUpdated: new Date().toISOString()
+      }
+      
+      // Cache the comprehensive result
+      this.setCache(cacheKey, result, 5) // Cache for 5 minutes
+      dataStorage.save(storageKey, result, 6) // Save for 6 hours
+      this.setupAutoRefresh(cacheKey, () => this.getCurrentWeatherData(true))
+      
+      return result
+    } catch (error) {
+      console.error('Failed to fetch comprehensive weather data:', error)
+      // Return fallback data
+      return {
+        alerts: await this.getCurrentWeatherAlerts(false, true),
+        severeEvents: [],
+        lastUpdated: new Date().toISOString()
+      }
+    }
   }
   
   // Cache management methods

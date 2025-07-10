@@ -13,7 +13,7 @@ export class DateValidator {
   
   constructor() {
     // Use the current date from the environment (July 4, 2025)
-    this.currentDate = new Date('2025-07-04')
+    this.currentDate = new Date()
   }
   
   // Validate if a date is current or recent
@@ -137,7 +137,7 @@ export const dateValidator = new DateValidator()
 
 // Utility functions for common date operations
 export const getCurrentDateString = (): string => {
-  return new Date('2025-07-04').toISOString().split('T')[0]
+  return new Date().toISOString().split('T')[0]
 }
 
 export const isEventCurrent = (eventDate: string, maxDaysOld: number = 30): boolean => {
