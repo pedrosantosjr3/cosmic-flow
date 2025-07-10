@@ -1,7 +1,7 @@
 /* Improved Earth Weather Component Styles */
 
 .earth-weather-improved {
-  padding: 20px;
+  padding: 20px 20px 60px 20px; /* Add extra bottom padding */
   /* Remove background to allow global background image to show through */
   background: linear-gradient(135deg, 
     rgba(0, 0, 0, 0.7) 0%, 
@@ -9,8 +9,10 @@
     rgba(25, 35, 65, 0.7) 50%, 
     rgba(10, 20, 40, 0.7) 100%);
   color: #ffffff;
-  min-height: 100vh;
+  min-height: calc(100vh - 40px); /* Account for navigation and ensure full content is visible */
   position: relative;
+  box-sizing: border-box;
+  overflow-y: auto; /* Ensure scrolling works if content is too tall */
 }
 
 .weather-header {
@@ -67,7 +69,8 @@
   grid-template-rows: auto auto;
   gap: 25px;
   max-width: 1800px;
-  margin: 0 auto;
+  margin: 0 auto 40px auto; /* Add bottom margin to prevent cutoff */
+  padding-bottom: 20px; /* Additional bottom padding */
 }
 
 .satellite-section {

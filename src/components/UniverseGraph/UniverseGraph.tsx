@@ -63,63 +63,10 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
   const [loading, setLoading] = useState(true)
   const [selectedNode, setSelectedNode] = useState<UniverseNode | null>(null)
   const [dimensions, setDimensions] = useState({ width: 1200, height: 800 })
-  const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState<string>('')
   const [showControls, setShowControls] = useState(true)
-  const [zoomLevel, setZoomLevel] = useState(1)
-  const [manualTransform, setManualTransform] = useState({ x: 0, y: 0, k: 1 })
 
-  // Manual zoom function as backup
-  const manualZoom = (scaleFactor: number) => {
-    console.log('Manual zoom triggered with factor:', scaleFactor)
-    if (svgRef.current) {
-      const svg = d3.select(svgRef.current)
-      const container = svg.select('.zoom-container')
-      
-      if (container.node()) {
-        const newK = Math.max(0.1, Math.min(10, manualTransform.k * scaleFactor))
-        const centerX = dimensions.width / 2
-        const centerY = dimensions.height / 2
-        const newX = centerX - (centerX - manualTransform.x) * (newK / manualTransform.k)
-        const newY = centerY - (centerY - manualTransform.y) * (newK / manualTransform.k)
-        
-        const newTransform = { x: newX, y: newY, k: newK }
-        setManualTransform(newTransform)
-        setZoomLevel(newTransform.k)
-        
-        container.transition()
-          .duration(300)
-          .attr('transform', `translate(${newTransform.x},${newTransform.y}) scale(${newTransform.k})`)
-        
-        console.log('Manual zoom applied:', newTransform)
-        return true
-      }
-    }
-    return false
-  }
 
-  // Manual reset function
-  const manualReset = () => {
-    console.log('Manual reset triggered')
-    if (svgRef.current) {
-      const svg = d3.select(svgRef.current)
-      const container = svg.select('.zoom-container')
-      
-      if (container.node()) {
-        const resetTransform = { x: 0, y: 0, k: 1 }
-        setManualTransform(resetTransform)
-        setZoomLevel(1)
-        
-        container.transition()
-          .duration(500)
-          .attr('transform', `translate(0,0) scale(1)`)
-        
-        console.log('Manual reset applied')
-        return true
-      }
-    }
-    return false
-  }
 
   // Initialize universe data
   useEffect(() => {
@@ -819,16 +766,12 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
     }, 10) // Ultra fast loading
   }
 
-  // Filter nodes based on selected category, search term, and filter type
+  // Filter nodes based on selected category and filter type
   const filteredNodes = nodes.filter(node => {
     const matchesCategory = !selectedCategory || node.type === selectedCategory
     const matchesFilter = !filterType || node.type === filterType
-    const matchesSearch = !searchTerm || 
-      node.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      node.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (node.facts?.description && node.facts.description.toLowerCase().includes(searchTerm.toLowerCase()))
     
-    return matchesCategory && matchesFilter && matchesSearch
+    return matchesCategory && matchesFilter
   })
 
   // Update D3 visualization
@@ -971,7 +914,6 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
       .on('zoom', (event) => {
         const transform = event.transform
         container.attr('transform', transform)
-        setZoomLevel(transform.k)
         
         // Adaptive label visibility and size based on zoom level
         const labels = container.selectAll('text')
@@ -1435,17 +1377,6 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
             
             {/* NASA-style search and filter controls */}
             <div className="navigation-controls">
-              <div className="search-section">
-                <label htmlFor="object-search">🔍 Search Objects:</label>
-                <input
-                  id="object-search"
-                  type="text"
-                  placeholder="Search by name, type, or description..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
-                />
-              </div>
               
               <div className="filter-section">
                 <label htmlFor="object-filter">🎯 Filter by Type:</label>
@@ -1470,95 +1401,6 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                 </select>
               </div>
               
-              <div className="zoom-controls">
-                <label>🔍 Zoom Level: {zoomLevel.toFixed(1)}x</label>
-                <p style={{fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', margin: '4px 0 8px 0'}}>Keys: +/- zoom, 0 reset, scroll wheel</p>
-                <div className="zoom-buttons">
-                  <button 
-                    onClick={() => {
-                      console.log('Zoom In clicked', { svgRef: !!svgRef.current, zoomRef: !!zoomRef.current })
-                      // Always use manual zoom for reliability
-                      console.log('Using manual zoom for zoom in')
-                      const success = manualZoom(1.5)
-                      if (!success) {
-                        console.error('Manual zoom failed!')
-                      }
-                    }}
-                    className="zoom-btn zoom-in"
-                    title="Zoom in for detailed view"
-                  >
-                    🔍+ Zoom In
-                  </button>
-                  <button 
-                    onClick={() => {
-                      console.log('Zoom Out clicked', { svgRef: !!svgRef.current, zoomRef: !!zoomRef.current })
-                      // Always use manual zoom for reliability
-                      console.log('Using manual zoom for zoom out')
-                      const success = manualZoom(0.67)
-                      if (!success) {
-                        console.error('Manual zoom failed!')
-                      }
-                    }}
-                    className="zoom-btn zoom-out"
-                    title="Zoom out for overview"
-                  >
-                    🔍− Zoom Out
-                  </button>
-                  <button 
-                    onClick={() => {
-                      console.log('Reset clicked')
-                      // Always use manual reset for reliability
-                      console.log('Using manual reset')
-                      const success = manualReset()
-                      if (!success) {
-                        console.error('Manual reset failed!')
-                      }
-                    }}
-                    className="zoom-btn reset"
-                    title="Reset to default view"
-                  >
-                    🎯 Reset View
-                  </button>
-                  <button 
-                    onClick={() => {
-                      if (svgRef.current && zoomRef.current) {
-                        const svg = d3.select(svgRef.current)
-                        const container = svg.select('.zoom-container')
-                        try {
-                          const bounds = (container.node() as any)?.getBBox()
-                          if (bounds && bounds.width > 0 && bounds.height > 0) {
-                            const fullWidth = dimensions.width
-                            const fullHeight = dimensions.height
-                            const scale = Math.min(fullWidth / bounds.width, fullHeight / bounds.height) * 0.7
-                            const translateX = fullWidth / 2 - scale * (bounds.x + bounds.width / 2)
-                            const translateY = fullHeight / 2 - scale * (bounds.y + bounds.height / 2)
-                            
-                            svg.transition().duration(750).ease(d3.easeQuadInOut).call(
-                              zoomRef.current.transform,
-                              d3.zoomIdentity.translate(translateX, translateY).scale(scale)
-                            )
-                          } else {
-                            // Fallback to reset if bounds calculation fails
-                            svg.transition().duration(500).call(
-                              zoomRef.current.transform, d3.zoomIdentity
-                            )
-                          }
-                        } catch (error) {
-                          console.log('Fit all fallback to reset')
-                          svg.transition().duration(500).call(
-                            zoomRef.current.transform, d3.zoomIdentity
-                          )
-                        }
-                      }
-                    }}
-                    className="zoom-btn fit-view"
-                    title="Fit all objects to view"
-                  >
-                    🌌 Fit All
-                  </button>
-                </div>
-              </div>
-              
               <div className="stats-display">
                 <div className="stat-item">
                   <span className="stat-label">Visible Objects:</span>
@@ -1567,18 +1409,6 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
                 <div className="stat-item">
                   <span className="stat-label">Total Objects:</span>
                   <span className="stat-value">{nodes.length}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Zoom Level:</span>
-                  <span className="stat-value">{(zoomLevel * 100).toFixed(0)}%</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">View Mode:</span>
-                  <span className="stat-value">
-                    {zoomLevel < 0.3 ? 'Overview' : 
-                     zoomLevel < 1 ? 'Normal' : 
-                     zoomLevel < 3 ? 'Detailed' : 'Close-up'}
-                  </span>
                 </div>
                 <div className="stat-item">
                   <span className="stat-label">Scale Representation:</span>
@@ -1648,16 +1478,6 @@ const UniverseGraph: React.FC<UniverseGraphProps> = ({ onNodeClick, selectedCate
               </div>
             </div>
             
-            {/* Quick navigation shortcuts */}
-            <div className="quick-nav">
-              <h4>Quick Navigation</h4>
-              <div className="nav-buttons">
-                <button onClick={() => setSearchTerm('sun')} className="nav-btn">☀️ Solar System</button>
-                <button onClick={() => setSearchTerm('proxima')} className="nav-btn">🌟 Nearby Stars</button>
-                <button onClick={() => setSearchTerm('dark')} className="nav-btn">🌌 Dark Universe</button>
-                <button onClick={() => setSearchTerm('quantum')} className="nav-btn">⚛️ Quantum Fields</button>
-              </div>
-            </div>
           </>
         )}
       </div>

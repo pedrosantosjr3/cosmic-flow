@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import UniverseGraph from './components/UniverseGraph/UniverseGraph'
-import Universe3D from './components/Universe3D/Universe3D'
 import UpdateStatus from './components/UpdateStatus/UpdateStatus'
 import EarthWeatherImproved from './components/EarthWeather/EarthWeatherImproved'
 import { NeoObject, ApodData } from './services/nasaAPI'
@@ -236,7 +235,6 @@ const App: React.FC = () => {
   const [showBlackHoleSim, setShowBlackHoleSim] = useState(false)
   const [showQuantumSim, setShowQuantumSim] = useState(false)
   const [showEMWaves, setShowEMWaves] = useState(false)
-  const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d')
   const [cosmicData, setCosmicData] = useState<CosmicData>({
     neoObjects: [],
     hazardousAsteroids: [],
@@ -552,27 +550,9 @@ const App: React.FC = () => {
 
   const renderUniverseExplorer = () => (
     <div className="universe-explorer">
-      <div className="view-mode-controls">
-        <button 
-          className={`mode-btn ${viewMode === '2d' ? 'active' : ''}`}
-          onClick={() => setViewMode('2d')}
-        >
-          📊 2D Universe Graph
-        </button>
-        <button 
-          className={`mode-btn ${viewMode === '3d' ? 'active' : ''}`}
-          onClick={() => setViewMode('3d')}
-        >
-          🌌 3D Universe Explorer
-        </button>
-      </div>
       <div className="universe-content">
         <div className="graph-section">
-          {viewMode === '2d' ? (
-            <UniverseGraph onNodeClick={handleNodeClick} />
-          ) : (
-            <Universe3D onNodeClick={handleNodeClick} />
-          )}
+          <UniverseGraph onNodeClick={handleNodeClick} />
         </div>
         
         {selectedNode && (
