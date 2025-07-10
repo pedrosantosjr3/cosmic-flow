@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import UniverseGraph from './components/UniverseGraph/UniverseGraph'
 import Universe3D from './components/Universe3D/Universe3D'
 import UpdateStatus from './components/UpdateStatus/UpdateStatus'
-import EarthWeather from './components/EarthWeather/EarthWeather'
+import EarthWeatherImproved from './components/EarthWeather/EarthWeatherImproved'
 import { NeoObject, ApodData } from './services/nasaAPI'
 import { enhancedNasaAPI } from './services/enhancedNasaAPI'
 import { SevereWeatherEvent } from './services/severeWeatherAPI'
@@ -1913,7 +1913,7 @@ const App: React.FC = () => {
         return renderNEOTracker()
       case 'earth-weather':
         return (
-          <EarthWeather 
+          <EarthWeatherImproved 
             weatherAlerts={weatherAlerts}
             severeWeatherEvents={severeWeatherEvents}
             weatherLastUpdated={weatherLastUpdated}

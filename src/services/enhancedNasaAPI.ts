@@ -3,6 +3,7 @@ import { dateValidator } from '../utils/dateValidation'
 import { dataStorage } from './dataStorage'
 import { weatherAPI, WeatherAlert } from './weatherAPI'
 import { severeWeatherAPI, SevereWeatherEvent } from './severeWeatherAPI'
+import { globalWeatherAPI, GlobalWeatherEvent, RegionalAlert } from './globalWeatherAPI'
 
 interface CachedData<T> {
   data: T
@@ -245,10 +246,12 @@ export class EnhancedNASAApiService {
     return currentAlerts
   }
   
-  // Get comprehensive weather data including severe events with impact data
+  // Get comprehensive global weather data including severe events with impact data
   async getCurrentWeatherData(forceRefresh: boolean = false, skipAPICall: boolean = false): Promise<{
     alerts: WeatherAlert[]
     severeEvents: SevereWeatherEvent[]
+    globalEvents: GlobalWeatherEvent[]
+    regionalAlerts: RegionalAlert[]
     lastUpdated: string
   }> {
     const cacheKey = 'weather-data-comprehensive'
@@ -270,15 +273,18 @@ export class EnhancedNASAApiService {
     }
     
     try {
-      // Fetch both regular alerts and severe events
-      const [alerts, severeEvents] = await Promise.all([
+      // Fetch from multiple sources: local alerts, severe events, and global data
+      const [alerts, severeEvents, globalData] = await Promise.all([
         this.getCurrentWeatherAlerts(forceRefresh, skipAPICall),
-        severeWeatherAPI.getCurrentSevereEvents()
+        severeWeatherAPI.getCurrentSevereEvents(),
+        globalWeatherAPI.getGlobalWeatherData()
       ])
       
       const result = {
         alerts,
         severeEvents,
+        globalEvents: globalData.catastrophicEvents,
+        regionalAlerts: globalData.regionalAlerts,
         lastUpdated: new Date().toISOString()
       }
       
@@ -291,9 +297,12 @@ export class EnhancedNASAApiService {
     } catch (error) {
       console.error('Failed to fetch comprehensive weather data:', error)
       // Return fallback data
+      const fallbackGlobal = await globalWeatherAPI.getGlobalWeatherData()
       return {
         alerts: await this.getCurrentWeatherAlerts(false, true),
         severeEvents: [],
+        globalEvents: fallbackGlobal.catastrophicEvents,
+        regionalAlerts: fallbackGlobal.regionalAlerts,
         lastUpdated: new Date().toISOString()
       }
     }

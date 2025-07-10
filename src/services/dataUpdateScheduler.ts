@@ -1,4 +1,5 @@
 import { enhancedNasaAPI } from './enhancedNasaAPI';
+import { globalWeatherAPI } from './globalWeatherAPI';
 
 interface ScheduledTask {
   id: string;
@@ -47,13 +48,38 @@ class DataUpdateScheduler {
       task: async () => {
         console.log('Running weather update...');
         try {
-          // Force refresh to get latest NOAA data
-          const weatherData = await enhancedNasaAPI.getCurrentWeatherAlerts(true);
+          // Force refresh to get latest global weather data
+          const weatherData = await enhancedNasaAPI.getCurrentWeatherData(true);
           this.saveToLocalStorage('weather-data', weatherData);
           this.updateLastRunTime('weather-update');
-          console.log(`Weather update completed successfully. ${weatherData.length} active alerts.`);
+          console.log(`Weather update completed successfully. ${weatherData.alerts.length} alerts, ${weatherData.globalEvents.length} catastrophic events.`);
         } catch (error) {
           console.error('Failed to update weather data:', error);
+        }
+      }
+    });
+    
+    // Catastrophic events update task - runs every 4 hours for critical events
+    this.registerTask({
+      id: 'catastrophic-update',
+      name: 'Catastrophic Events Update',
+      interval: 4 * 60 * 60 * 1000, // 4 hours
+      task: async () => {
+        console.log('Running catastrophic events update...');
+        try {
+          // Check which events need updates based on their individual intervals
+          const eventsNeedingUpdate = await globalWeatherAPI.getEventsNeedingUpdate();
+          if (eventsNeedingUpdate.length > 0) {
+            // Force refresh global weather data to get latest catastrophic event updates
+            const globalData = await globalWeatherAPI.getGlobalWeatherData();
+            this.saveToLocalStorage('catastrophic-events', globalData.catastrophicEvents);
+            this.updateLastRunTime('catastrophic-update');
+            console.log(`Catastrophic events update completed. ${eventsNeedingUpdate.length} events updated.`);
+          } else {
+            console.log('No catastrophic events require updates at this time.');
+          }
+        } catch (error) {
+          console.error('Failed to update catastrophic events:', error);
         }
       }
     });
