@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import UniverseGraph from './components/UniverseGraph/UniverseGraph'
 import Universe3D from './components/Universe3D/Universe3D'
+import UpdateStatus from './components/UpdateStatus/UpdateStatus'
 import { NeoObject, ApodData } from './services/nasaAPI'
 import { enhancedNasaAPI } from './services/enhancedNasaAPI'
 import { dateValidator, getTimeSinceEvent } from './utils/dateValidation'
+import { dataUpdateScheduler } from './services/dataUpdateScheduler'
+import { dataStorage } from './services/dataStorage'
 import './App-professional.css'
 import './enhanced-styles.css'
 import './background-override.css'
@@ -246,7 +249,17 @@ const App: React.FC = () => {
 
   // Load cosmic data with graceful fallbacks
   useEffect(() => {
-    loadCosmicDataWithFallback()
+    // Initialize the data update scheduler
+    // This will handle automatic daily updates
+    console.log('Initializing data update scheduler...')
+    
+    // Load initial data (preferring stored data first)
+    loadCosmicDataWithFallback(true)
+    
+    // Cleanup scheduler on unmount
+    return () => {
+      dataUpdateScheduler.cleanup()
+    }
   }, [])
 
   // Update background based on active tab
@@ -268,21 +281,52 @@ const App: React.FC = () => {
     }
   }, [activeTab])
 
-  const loadCosmicDataWithFallback = async () => {
+  const loadCosmicDataWithFallback = async (preferStoredData: boolean = false) => {
     setCosmicData(prev => ({ ...prev, loading: true, error: null }))
     
     try {
-      // Try to fetch real data first
-      const [neoData, apodData, weatherData] = await Promise.all([
-        enhancedNasaAPI.getCurrentNEOs(),
-        enhancedNasaAPI.getCurrentAPOD(),
-        enhancedNasaAPI.getCurrentWeatherAlerts()
-      ])
+      // Check if we should use stored data first
+      let neoData, apodData, weatherData
+      
+      if (preferStoredData) {
+        // Try to load from storage first
+        const storedNeo = dataStorage.load<any>('neo-data')
+        const storedWeather = dataStorage.load<any>('weather-data')
+        
+        if (storedNeo && storedWeather) {
+          console.log('Loading data from local storage...')
+          neoData = storedNeo
+          weatherData = storedWeather
+          // Still fetch APOD as it changes daily
+          apodData = await enhancedNasaAPI.getCurrentAPOD(false)
+        } else {
+          console.log('No stored data found, fetching from API...')
+          // Fetch from API if no stored data
+          const results = await Promise.all([
+            enhancedNasaAPI.getCurrentNEOs(),
+            enhancedNasaAPI.getCurrentAPOD(),
+            enhancedNasaAPI.getCurrentWeatherAlerts()
+          ])
+          neoData = results[0]
+          apodData = results[1]
+          weatherData = results[2]
+        }
+      } else {
+        // Normal API fetch
+        const results = await Promise.all([
+          enhancedNasaAPI.getCurrentNEOs(),
+          enhancedNasaAPI.getCurrentAPOD(),
+          enhancedNasaAPI.getCurrentWeatherAlerts()
+        ])
+        neoData = results[0]
+        apodData = results[1]
+        weatherData = results[2]
+      }
       
       setCosmicData({
         neoObjects: neoData.allNeos,
         hazardousAsteroids: neoData.hazardousNeos,
-        apodData: apodData,
+        apodData: apodData || null,
         spaceWeather: [],
         loading: false,
         error: null
@@ -1936,6 +1980,9 @@ const App: React.FC = () => {
       <main className="main-content">
         {renderContent()}
       </main>
+      
+      {/* Update Status Indicator */}
+      <UpdateStatus />
     </div>
   )
 }

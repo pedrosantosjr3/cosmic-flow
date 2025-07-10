@@ -1,5 +1,7 @@
 import { nasaAPI, NeoObject, ApodData } from './nasaAPI'
 import { dateValidator } from '../utils/dateValidation'
+import { dataStorage } from './dataStorage'
+import { weatherAPI, WeatherAlert } from './weatherAPI'
 
 interface CachedData<T> {
   data: T
@@ -7,22 +9,6 @@ interface CachedData<T> {
   expiresAt: string
 }
 
-interface WeatherAlert {
-  id: string
-  type: 'heat' | 'storm' | 'fire' | 'flood' | 'hurricane' | 'tornado'
-  severity: 'info' | 'warning' | 'critical'
-  title: string
-  description: string
-  location: {
-    lat: number
-    lon: number
-    name: string
-  }
-  startTime: string
-  endTime?: string
-  source: string
-  lastUpdated: string
-}
 
 export class EnhancedNASAApiService {
   private cache: Map<string, CachedData<any>> = new Map()
@@ -30,7 +16,7 @@ export class EnhancedNASAApiService {
   private autoRefreshTimers: Map<string, any> = new Map()
   
   // Get current NEO data with automatic filtering and caching
-  async getCurrentNEOs(forceRefresh: boolean = false): Promise<{
+  async getCurrentNEOs(forceRefresh: boolean = false, skipAPICall: boolean = false): Promise<{
     allNeos: NeoObject[]
     hazardousNeos: NeoObject[]
     upcomingApproaches: NeoObject[]
@@ -43,10 +29,31 @@ export class EnhancedNASAApiService {
     }
   }> {
     const cacheKey = 'current-neos'
+    const storageKey = 'neo-data'
     
-    // Check cache first
+    // Check memory cache first
     if (!forceRefresh && this.hasValidCache(cacheKey)) {
       return this.getFromCache(cacheKey)
+    }
+    
+    // Check persistent storage if not forcing refresh and skipAPICall is true
+    if (!forceRefresh && skipAPICall) {
+      const storedData = dataStorage.load<any>(storageKey)
+      if (storedData) {
+        // Update memory cache from storage
+        this.setCache(cacheKey, storedData, 15)
+        return storedData
+      }
+    }
+    
+    // Check persistent storage as fallback if API is not to be called
+    if (skipAPICall) {
+      const storedData = dataStorage.load<any>(storageKey)
+      if (storedData) {
+        return storedData
+      }
+      // If no stored data and skipAPICall, return mock data
+      return this.getMockNEOData()
     }
     
     try {
@@ -108,8 +115,9 @@ export class EnhancedNASAApiService {
         stats
       }
       
-      // Cache the result
+      // Cache the result in memory and persistent storage
       this.setCache(cacheKey, result, 15)
+      dataStorage.save(storageKey, result, 24) // Save for 24 hours
       
       // Set up auto-refresh
       this.setupAutoRefresh(cacheKey, () => this.getCurrentNEOs(true))
@@ -163,15 +171,48 @@ export class EnhancedNASAApiService {
     }
   }
   
-  // Get simulated real-time weather alerts (since we can't get actual 2025 weather)
-  async getCurrentWeatherAlerts(): Promise<WeatherAlert[]> {
+  // Get real-time weather alerts from NOAA
+  async getCurrentWeatherAlerts(forceRefresh: boolean = false, skipAPICall: boolean = false): Promise<WeatherAlert[]> {
     const cacheKey = 'weather-alerts'
+    const storageKey = 'weather-data'
     
-    if (this.hasValidCache(cacheKey)) {
+    // Check memory cache first
+    if (!forceRefresh && this.hasValidCache(cacheKey)) {
       return this.getFromCache(cacheKey)
     }
     
-    // Simulate realistic July 2025 weather events
+    // Check persistent storage if not forcing refresh and skipAPICall is true
+    if (!forceRefresh && skipAPICall) {
+      const storedData = dataStorage.load<WeatherAlert[]>(storageKey)
+      if (storedData) {
+        // Update memory cache from storage
+        this.setCache(cacheKey, storedData, 5)
+        return storedData
+      }
+    }
+    
+    try {
+      // Try to get real weather alerts from NOAA
+      const realAlerts = await weatherAPI.getActiveWeatherAlerts()
+      
+      if (realAlerts.length > 0) {
+        console.log(`Fetched ${realAlerts.length} real weather alerts from NOAA`)
+        
+        // Save to cache and storage
+        this.setCache(cacheKey, realAlerts, 5) // Cache for 5 minutes
+        dataStorage.save(storageKey, realAlerts, 24) // Save for 24 hours
+        this.setupAutoRefresh(cacheKey, () => this.getCurrentWeatherAlerts())
+        
+        return realAlerts
+      }
+      
+      // If no real alerts, fall back to mock data
+      console.log('No active NOAA alerts, using mock data')
+    } catch (error) {
+      console.error('Failed to fetch NOAA alerts, using mock data:', error)
+    }
+    
+    // Mock data fallback for when NOAA API fails or returns no data
     const alerts: WeatherAlert[] = [
       {
         id: 'heat-2025-07-sw',
@@ -183,40 +224,6 @@ export class EnhancedNASAApiService {
         startTime: '2025-07-02T00:00:00Z',
         endTime: '2025-07-09T23:59:59Z',
         source: 'National Weather Service',
-        lastUpdated: new Date().toISOString()
-      },
-      {
-        id: 'fire-2025-07-ca',
-        type: 'fire',
-        severity: 'critical',
-        title: 'Sierra Nevada Fire Complex',
-        description: '15,000+ acre wildfire complex burning in Northern California. Evacuations in effect for multiple communities.',
-        location: { lat: 39.7285, lon: -121.8375, name: 'Butte County, CA' },
-        startTime: '2025-07-01T14:30:00Z',
-        source: 'CAL FIRE',
-        lastUpdated: new Date().toISOString()
-      },
-      {
-        id: 'storm-2025-07-tx',
-        type: 'storm',
-        severity: 'warning',
-        title: 'Severe Monsoon Thunderstorms',
-        description: 'Active monsoon pattern bringing severe thunderstorms with large hail and damaging winds to Texas Panhandle.',
-        location: { lat: 35.2220, lon: -101.8313, name: 'Amarillo, TX' },
-        startTime: '2025-07-04T18:00:00Z',
-        endTime: '2025-07-05T06:00:00Z',
-        source: 'Storm Prediction Center',
-        lastUpdated: new Date().toISOString()
-      },
-      {
-        id: 'hurricane-2025-07-atl',
-        type: 'hurricane',
-        severity: 'info',
-        title: 'Tropical System 95L Development',
-        description: 'Area of low pressure showing signs of organization. 70% chance of tropical cyclone formation within 48 hours.',
-        location: { lat: 25.4, lon: -45.2, name: 'Central Atlantic' },
-        startTime: '2025-07-03T12:00:00Z',
-        source: 'National Hurricane Center',
         lastUpdated: new Date().toISOString()
       }
     ]
@@ -231,6 +238,7 @@ export class EnhancedNASAApiService {
     })
     
     this.setCache(cacheKey, currentAlerts, 5) // Cache for 5 minutes
+    dataStorage.save(storageKey, currentAlerts, 24) // Save for 24 hours
     this.setupAutoRefresh(cacheKey, () => this.getCurrentWeatherAlerts())
     
     return currentAlerts
@@ -405,5 +413,5 @@ export const enhancedNasaAPI = new EnhancedNASAApiService()
 
 // Helper function to get current date string
 function getCurrentDateString(): string {
-  return '2025-07-04'
+  return new Date().toISOString().split('T')[0]
 }
