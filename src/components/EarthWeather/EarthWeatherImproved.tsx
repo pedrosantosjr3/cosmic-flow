@@ -313,8 +313,22 @@ const EarthWeatherImproved: React.FC<EarthWeatherImprovedProps> = ({
                       <p className="event-location">📍 {event.location}</p>
                     </div>
                     <div className="casualty-count">
-                      <span className="deaths">💀 {event.deaths}</span>
-                      {event.injuries > 0 && <span className="injuries">🏥 {event.injuries}</span>}
+                      <div className="casualty-item">
+                        <span className="casualty-icon">💀</span>
+                        <div className="casualty-details">
+                          <span className="casualty-number">{event.deaths}</span>
+                          <span className="casualty-label">Deaths</span>
+                        </div>
+                      </div>
+                      {event.injuries > 0 && (
+                        <div className="casualty-item">
+                          <span className="casualty-icon">🏥</span>
+                          <div className="casualty-details">
+                            <span className="casualty-number">{event.injuries}</span>
+                            <span className="casualty-label">Injured</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
